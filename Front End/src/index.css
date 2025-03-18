@@ -1,0 +1,84 @@
+/* src/index.css */
+
+/* Base Tailwind imports (already present in your setup) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* You can add some extra classes or override if you like. */
+
+/* Arrows or small indicators for chaining */
+.arrow-right::after {
+  content: "→";
+  display: inline-block;
+  margin: 0 0.5rem;
+  color: #4b5563; /* Gray-700 in Tailwind */
+}
+
+.arrow-down::after {
+  content: "↓";
+  display: block;
+  text-align: center;
+  color: #4b5563; /* Gray-700 */
+  margin: 0.25rem 0;
+}
+
+/* A container class for our data structure items, ensuring spacing */
+.ds-flex-chain {
+  display: flex;
+  align-items: center;
+}
+
+/* If we want to label "Head", "Tail", "Top", "Bottom", etc. nicely. */
+.ds-label {
+  font-size: 0.75rem;
+  color: #6b7280; /* gray-500 */
+  margin-bottom: 0.25rem;
+  text-align: center;
+}
+
+/* Example styling for an index label */
+.ds-index {
+  background-color: #d1d5db; /* gray-300 */
+  color: #1f2937; /* gray-800 */
+  border-radius: 9999px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+/* Optional CSS for tree connectors */
+.tree-node {
+  position: relative;
+  padding: 10px;
+}
+
+.children-container {
+  position: relative;
+  margin-top: 20px;
+}
+
+.vertical-line {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 2px solid #ccc;
+  height: 20px;
+}
+
+.children {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  position: relative;
+  margin-top: 10px;
+}
+
+.children::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-top: 2px solid #ccc;
+}
