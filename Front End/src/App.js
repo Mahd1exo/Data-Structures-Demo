@@ -11,6 +11,7 @@ import QueueSection from "./components/QueueSection";
 import HeapSection from "./components/HeapSection";
 import HashTableSection from "./components/HashTableSection";
 import TreeSection from "./components/TreeSection";
+import BSTSection from "./components/BSTSection"; // New BST section
 
 function App() {
   const [activeTab, setActiveTab] = useState("list");
@@ -100,6 +101,18 @@ function App() {
                 transition={{ duration: 0.3 }}
               >
                 <TreeSection />
+              </motion.div>
+            )}
+            {activeTab === "bst" && (
+              <motion.div
+                key="bst"
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={{ duration: 0.3 }}
+              >
+                <BSTSection />
               </motion.div>
             )}
           </AnimatePresence>

@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ds_bst.c" />
     <ClCompile Include="ds_hashtable.c" />
     <ClCompile Include="ds_heap.c" />
     <ClCompile Include="ds_json_utils.c" />
@@ -138,6 +139,7 @@
     <ClCompile Include="route_handlers.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ds_bst.h" />
     <ClInclude Include="ds_hashtable.h" />
     <ClInclude Include="ds_heap.h" />
     <ClInclude Include="ds_json_utils.h" />

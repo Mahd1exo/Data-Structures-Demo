@@ -42,6 +42,9 @@
     <ClCompile Include="ds_hashtable.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ds_bst.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="route_handlers.h">
@@ -66,6 +69,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ds_hashtable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_bst.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -90,13 +90,11 @@ export async function dequeue() {
 }
 
 /* ---------- Tree ---------- */
-/* Fetch the entire tree as nested JSON */
 export async function fetchTree() {
   const res = await fetch(`${BASE_URL}/api/tree`);
   return await res.json();
 }
 
-/* Default tree insertion (if no parent specified) */
 export async function treeInsert(value) {
   const res = await fetch(`${BASE_URL}/api/tree/insert`, {
     method: "POST",
@@ -105,8 +103,6 @@ export async function treeInsert(value) {
   });
   return await res.json();
 }
-
-/* Remove a node by its unique ID */
 export async function treeRemove(id) {
   const res = await fetch(`${BASE_URL}/api/tree/remove`, {
     method: "POST",
@@ -116,7 +112,6 @@ export async function treeRemove(id) {
   return await res.json();
 }
 
-/* Insert a child node under a specified parent (parent is an integer ID) */
 export async function treeInsertChild(parent, value) {
   const res = await fetch(`${BASE_URL}/api/tree/insert-child`, {
     method: "POST",
@@ -126,7 +121,6 @@ export async function treeInsertChild(parent, value) {
   return await res.json();
 }
 
-/* Remove a child node under a specified parent by its unique ID */
 export async function treeRemoveChild(parent, id) {
   const res = await fetch(`${BASE_URL}/api/tree/remove-child`, {
     method: "POST",
@@ -135,7 +129,27 @@ export async function treeRemoveChild(parent, id) {
   });
   return await res.json();
 }
+/* ---------- Heap ---------- */
+export async function fetchHeap() {
+  const res = await fetch(`${BASE_URL}/api/heap`);
+  return await res.json();
+}
 
+export async function heapInsert(value) {
+  const res = await fetch(`${BASE_URL}/api/heap/insert`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ value }),
+  });
+  return await res.json();
+}
+
+export async function heapExtractTop() {
+  const res = await fetch(`${BASE_URL}/api/heap/extract-top`, {
+    method: "DELETE",
+  });
+  return await res.json();
+}
 /* ---------- Hash Table ---------- */
 export async function fetchHash() {
   const res = await fetch(`${BASE_URL}/api/hash`);
@@ -164,6 +178,40 @@ export async function hashContains(key) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ key }),
+  });
+  return await res.json();
+}
+/* ---------- BST ---------- */
+export async function fetchBST() {
+  try {
+    const res = await fetch(`${BASE_URL}/api/bst`);
+    if (!res.ok) {
+      console.error("HTTP error:", res.status, res.statusText);
+      throw new Error("HTTP error " + res.status);
+    }
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error in fetchBST:", err);
+    throw err;
+  }
+}
+
+
+export async function bstInsert(value) {
+  const res = await fetch(`${BASE_URL}/api/bst/insert`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ value }),
+  });
+  return await res.json();
+}
+
+export async function bstRemove(value) {
+  const res = await fetch(`${BASE_URL}/api/bst/remove`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ value }),
   });
   return await res.json();
 }

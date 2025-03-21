@@ -4,9 +4,10 @@ import {
   FaBars,       // LinkedList
   FaLayerGroup, // Stack
   FaStream,     // Queue
-  FaTree,       // Tree
   FaDatabase,   // Heap
-  FaHashtag     // Hash
+  FaHashtag,    // Hash
+  FaTree,       // Tree
+  FaSitemap     // BST
 } from "react-icons/fa";
 
 function Tabs({ activeTab, onTabChange }) {
@@ -53,6 +54,12 @@ function Tabs({ activeTab, onTabChange }) {
         <div className="flex items-center gap-1">
           <FaTree />
           <span>Tree</span>
+        </div>
+      </button>
+      <button className={tabClass("bst")} onClick={() => onTabChange("bst")}>
+        <div className="flex items-center gap-1">
+          <FaSitemap />
+          <span>BST</span>
         </div>
       </button>
     </div>

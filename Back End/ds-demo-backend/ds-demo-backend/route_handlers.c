@@ -8,6 +8,7 @@
 #include <civetweb.h>
 
 /* Data structure headers – make sure these exist and are compiled into your project */
+#include "ds_bst.h"
 #include "ds_linkedlist.h"
 #include "ds_stack.h"
 #include "ds_queue.h"
@@ -25,6 +26,7 @@ static Queue g_queue;
 static SimpleTree g_tree;
 static SimpleHeap g_heap;
 static SimpleHashTable g_hash;
+static SimpleBST g_bst;
 
 /* ---------------------------------------------------------------------------
    Helper Functions
@@ -497,10 +499,6 @@ static int handle_hash_remove(struct mg_connection* conn, void* cbdata) {
     return handle_hash_getall(conn, NULL);
 }
 
-/* Optional "contains" endpoint:
-   Expects JSON: { "key": "someKey" }
-   Returns { "contains": true } or { "contains": false }
-*/
 static int handle_hash_contains(struct mg_connection* conn, void* cbdata) {
     char body[1024];
     read_request_body(conn, body, sizeof(body));
@@ -517,6 +515,42 @@ static int handle_hash_contains(struct mg_connection* conn, void* cbdata) {
     send_json(conn, resp);
     return 200;
 }
+/* ---------------------------------------------------------------------------
+   BST Endpoints
+--------------------------------------------------------------------------- */
+
+static int handle_bst_get(struct mg_connection* conn, void* cbdata) {
+    char* json = bst_to_json(&g_bst);
+    mg_printf(conn,
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: application/json\r\n"
+        "Access-Control-Allow-Origin: *\r\n"
+        "Content-Length: %d\r\n\r\n%s",
+        (int)strlen(json),
+        json);
+    free(json);
+    return 200;
+}
+
+static int handle_bst_insert(struct mg_connection* conn, void* cbdata) {
+    char body[1024];
+    read_request_body(conn, body, sizeof(body));
+    char value[64];
+    if (extract_value_from_body(body, value, sizeof(value))) {
+        bst_insert(&g_bst, value);
+    }
+    return handle_bst_get(conn, NULL);
+}
+
+static int handle_bst_remove(struct mg_connection* conn, void* cbdata) {
+    char body[1024];
+    read_request_body(conn, body, sizeof(body));
+    char value[64];
+    if (extract_value_from_body(body, value, sizeof(value))) {
+        bst_remove(&g_bst, value);
+    }
+    return handle_bst_get(conn, NULL);
+}
 
 
 /* ---------------------------------------------------------------------------
@@ -530,6 +564,7 @@ void register_endpoints(struct mg_context* ctx) {
     tree_init(&g_tree);
     heap_init(&g_heap);
     hash_init(&g_hash);
+    bst_init(&g_bst);
 
     /* LinkedList Endpoints */
     mg_set_request_handler(ctx, "/api/linked-list", handle_get_linked_list, NULL);
@@ -565,4 +600,9 @@ void register_endpoints(struct mg_context* ctx) {
     mg_set_request_handler(ctx, "/api/hash/insert", handle_hash_insert, NULL);
     mg_set_request_handler(ctx, "/api/hash/remove", handle_hash_remove, NULL);
     mg_set_request_handler(ctx, "/api/hash/contains", handle_hash_contains, NULL);
+
+    /* BST Endpoints */
+    mg_set_request_handler(ctx, "/api/bst", handle_bst_get, NULL);
+    mg_set_request_handler(ctx, "/api/bst/insert", handle_bst_insert, NULL);
+    mg_set_request_handler(ctx, "/api/bst/remove", handle_bst_remove, NULL);
 }

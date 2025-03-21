@@ -2,104 +2,117 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "ds_heap.h"
 
-static void safeCopy(char* dest, const char* src, int maxLen) {
-    if (!src) {
-        dest[0] = '\0';
-        return;
+/* Helper function: duplicate a string */
+static char* str_dup(const char* s) {
+    if (!s) return NULL;
+    size_t len = strlen(s);
+    char* copy = (char*)malloc(len + 1);
+    if (copy) {
+        strcpy(copy, s);
     }
-    strncpy(dest, src, maxLen - 1);
-    dest[maxLen - 1] = '\0';
+    return copy;
 }
 
+/* Initialize the heap */
 void heap_init(SimpleHeap* heap) {
     if (!heap) return;
     heap->size = 0;
-}
-
-/* A naive min-heap: use 1-based or 0-based indexing? We'll do 0-based.
-   parent(i) = (i-1)/2, left(i) = 2i+1, right(i)=2i+2 */
-static void swap_str(char* a, char* b) {
-    char temp[HEAP_MAX_LEN];
-    safeCopy(temp, a, HEAP_MAX_LEN);
-    safeCopy(a, b, HEAP_MAX_LEN);
-    safeCopy(b, temp, HEAP_MAX_LEN);
-}
-
-static int cmp_str(const char* a, const char* b) {
-    return strcmp(a, b); /* for min-heap: if a < b => a is "higher priority" */
-}
-
-static void heapify_up(SimpleHeap* heap, int idx) {
-    while (idx > 0) {
-        int parent = (idx - 1) / 2;
-        if (cmp_str(heap->data[idx], heap->data[parent]) < 0) {
-            swap_str(heap->data[idx], heap->data[parent]);
-            idx = parent;
-        }
-        else {
-            break;
-        }
+    for (int i = 0; i < HEAP_CAPACITY; i++) {
+        heap->items[i] = NULL;
     }
 }
 
-static void heapify_down(SimpleHeap* heap, int idx) {
-    int size = heap->size;
-    while (1) {
-        int left = 2 * idx + 1;
-        int right = 2 * idx + 2;
-        int smallest = idx;
-        if (left < size && cmp_str(heap->data[left], heap->data[smallest]) < 0) {
-            smallest = left;
-        }
-        if (right < size && cmp_str(heap->data[right], heap->data[smallest]) < 0) {
-            smallest = right;
-        }
-        if (smallest == idx) break;
-        swap_str(heap->data[idx], heap->data[smallest]);
-        idx = smallest;
+/* Swap two pointers */
+static void swap(char** a, char** b) {
+    char* temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+/* Convert a string to a double */
+static double str_to_double(const char* s) {
+    return atof(s);
+}
+
+/* Heapify up: ensure max-heap property after insertion */
+static void heapify_up(SimpleHeap* heap, int index) {
+    if (index <= 0) return;
+    int parent = (index - 1) / 2;
+    if (parent >= 0 && str_to_double(heap->items[index]) > str_to_double(heap->items[parent])) {
+        swap(&heap->items[index], &heap->items[parent]);
+        heapify_up(heap, parent);
     }
 }
 
+/* Heapify down: ensure max-heap property after extraction */
+static void heapify_down(SimpleHeap* heap, int index) {
+    int largest = index;
+    int left = 2 * index + 1;
+    int right = 2 * index + 2;
+    if (left < heap->size && str_to_double(heap->items[left]) > str_to_double(heap->items[largest])) {
+        largest = left;
+    }
+    if (right < heap->size && str_to_double(heap->items[right]) > str_to_double(heap->items[largest])) {
+        largest = right;
+    }
+    if (largest != index) {
+        swap(&heap->items[index], &heap->items[largest]);
+        heapify_down(heap, largest);
+    }
+}
+
+/* Insert a new value into the max heap */
 void heap_insert(SimpleHeap* heap, const char* value) {
-    if (!heap || heap->size >= HEAP_MAX_SIZE) return;
-    safeCopy(heap->data[heap->size], value, HEAP_MAX_LEN);
+    if (!heap) return;
+    if (heap->size >= HEAP_CAPACITY) {
+        // Heap is full; you might want to handle this error.
+        return;
+    }
+    heap->items[heap->size] = str_dup(value); // Duplicate the string
+    heapify_up(heap, heap->size);
     heap->size++;
-    heapify_up(heap, heap->size - 1);
 }
 
-/* extract top (the smallest) */
+/* Extract the top (maximum) element from the heap.
+   Copies the extracted value into outValue.
+*/
 int heap_extract_top(SimpleHeap* heap, char* outValue, int outSize) {
     if (!heap || heap->size == 0) return 0;
-    /* root is data[0], copy it out */
-    safeCopy(outValue, heap->data[0], outSize);
-    /* move last to root */
+    // Copy the top element to outValue
+    strncpy(outValue, heap->items[0], outSize - 1);
+    outValue[outSize - 1] = '\0';
+    free(heap->items[0]);
+    // Move the last element to the root
+    heap->items[0] = heap->items[heap->size - 1];
     heap->size--;
-    if (heap->size > 0) {
-        safeCopy(heap->data[0], heap->data[heap->size], HEAP_MAX_LEN);
-        heapify_down(heap, 0);
-    }
+    heapify_down(heap, 0);
     return 1;
 }
 
-char** heap_collect(const SimpleHeap* heap, int* count) {
+/* Collect heap items into an array. The caller must free the array (not the strings). */
+char** heap_collect(SimpleHeap* heap, int* count) {
     if (!heap) {
         if (count) *count = 0;
         return NULL;
     }
-    int n = heap->size;
-    if (count) *count = n;
-    if (n <= 0) return NULL;
-    /* copy pointers to each string in order [0..size-1] */
-    char** arr = (char**)malloc(sizeof(char*) * n);
-    for (int i = 0; i < n; i++) {
-        arr[i] = (char*)heap->data[i]; /* pointer to that string in the array */
+    int size = heap->size;
+    char** arr = (char**)malloc(sizeof(char*) * size);
+    for (int i = 0; i < size; i++) {
+        arr[i] = heap->items[i];
     }
+    if (count) *count = size;
     return arr;
 }
 
+/* Clear the heap by freeing all allocated strings and resetting size */
 void heap_clear(SimpleHeap* heap) {
     if (!heap) return;
+    for (int i = 0; i < heap->size; i++) {
+        free(heap->items[i]);
+        heap->items[i] = NULL;
+    }
     heap->size = 0;
 }
