@@ -34,6 +34,13 @@ void stk_pop(Stack* stack) {
     free(temp);
 }
 
+void stk_clear(Stack* stack) {
+    if (!stack) return;
+    while (stack->top) {
+        stk_pop(stack);
+    }
+}
+
 char** stk_collect_data(const Stack* stack, int* count) {
     if (!stack) {
         if (count) *count = 0;

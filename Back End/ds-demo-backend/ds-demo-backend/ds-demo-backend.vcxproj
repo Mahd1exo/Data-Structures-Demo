@@ -127,27 +127,48 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ds_avl.c" />
     <ClCompile Include="ds_bst.c" />
+    <ClCompile Include="ds_circularlist.c" />
     <ClCompile Include="ds_hashtable.c" />
-    <ClCompile Include="ds_heap.c" />
-    <ClCompile Include="ds_json_utils.c" />
+    <ClCompile Include="ds_maxheap.c" />
     <ClCompile Include="ds_linkedlist.c" />
+    <ClCompile Include="ds_minheap.c" />
     <ClCompile Include="ds_queue.c" />
+    <ClCompile Include="ds_sortedlist.c" />
     <ClCompile Include="ds_stack.c" />
     <ClCompile Include="ds_tree.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="route_avl.c" />
+    <ClCompile Include="route_bst.c" />
+    <ClCompile Include="route_circularlist.c" />
+    <ClCompile Include="route_globals.c" />
     <ClCompile Include="route_handlers.c" />
+    <ClCompile Include="route_hash.c" />
+    <ClCompile Include="route_maxheap.c" />
+    <ClCompile Include="route_linkedlist.c" />
+    <ClCompile Include="route_minheap.c" />
+    <ClCompile Include="route_queue.c" />
+    <ClCompile Include="route_sortedlist.c" />
+    <ClCompile Include="route_stack.c" />
+    <ClCompile Include="route_tree.c" />
+    <ClCompile Include="route_utils.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ds_avl.h" />
     <ClInclude Include="ds_bst.h" />
+    <ClInclude Include="ds_circularlist.h" />
     <ClInclude Include="ds_hashtable.h" />
-    <ClInclude Include="ds_heap.h" />
-    <ClInclude Include="ds_json_utils.h" />
+    <ClInclude Include="ds_maxheap.h" />
     <ClInclude Include="ds_linkedlist.h" />
+    <ClInclude Include="ds_minheap.h" />
     <ClInclude Include="ds_queue.h" />
+    <ClInclude Include="ds_sortedlist.h" />
     <ClInclude Include="ds_stack.h" />
     <ClInclude Include="ds_tree.h" />
+    <ClInclude Include="route_globals.h" />
     <ClInclude Include="route_handlers.h" />
+    <ClInclude Include="route_utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

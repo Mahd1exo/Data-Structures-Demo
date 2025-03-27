@@ -1,6 +1,6 @@
 // src/components/BSTSection.js
 import React, { useState, useEffect, useRef } from "react";
-import { fetchBST, bstInsert, bstRemove } from "../services/api";
+import { fetchBST, bstInsert, bstRemove, bstClear } from "../services/api";
 import BSTNode from "./BSTNode";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaPlus, FaTrash, FaSync, FaInfoCircle } from "react-icons/fa";
@@ -16,9 +16,16 @@ function BSTSection() {
     fetchBSTData();
   }, []);
 
-  // Helper function: Validate integer (allows optional leading + or -)
+  // Helper function: Validate integer (allows optional leading -)
   function isValidInt(str) {
     return /^-?\d+$/.test(str);
+  }
+
+  // Helper function: Recursively check if the value already exists in the BST
+  function existsInBST(node, value) {
+    if (!node) return false;
+    if (node.value === value) return true;
+    return existsInBST(node.left, value) || existsInBST(node.right, value);
   }
 
   async function fetchBSTData() {
@@ -37,19 +44,23 @@ function BSTSection() {
   }
 
   async function handleInsert() {
-    if (!nodeValue.trim()) {
+    const trimmedValue = nodeValue.trim();
+    if (!trimmedValue) {
       setErrorMessage("Please enter a valid integer.");
       return;
     }
-    if (!isValidInt(nodeValue.trim())) {
+    if (!isValidInt(trimmedValue)) {
       setErrorMessage("Input must be an integer (no special characters).");
+      return;
+    }
+    if (bst && existsInBST(bst, trimmedValue)) {
+      setErrorMessage("Value already exists in the tree.");
       return;
     }
     setErrorMessage("");
     try {
-      const res = await bstInsert(nodeValue.trim());
+      const res = await bstInsert(trimmedValue);
       if (res.error) {
-        // Expect backend to return error message for duplicate insertions.
         setErrorMessage(res.error || "Cannot add duplicate value.");
       } else {
         setNodeValue("");
@@ -62,19 +73,24 @@ function BSTSection() {
   }
 
   async function handleRemove() {
-    if (!nodeValue.trim()) {
+    const trimmedValue = nodeValue.trim();
+    if (!trimmedValue) {
       setErrorMessage("Please enter a valid integer to remove.");
       return;
     }
-    if (!isValidInt(nodeValue.trim())) {
+    if (!isValidInt(trimmedValue)) {
       setErrorMessage("Input must be an integer (no special characters).");
+      return;
+    }
+    // Validate deletion: Check if the value exists in the BST
+    if (!bst || !existsInBST(bst, trimmedValue)) {
+      setErrorMessage("Value does not exist in the tree.");
       return;
     }
     setErrorMessage("");
     try {
-      const res = await bstRemove(nodeValue.trim());
+      const res = await bstRemove(trimmedValue);
       if (res.error) {
-        // Expect backend to return error message if the node doesn't exist.
         setErrorMessage(res.error || "Node not found.");
       } else {
         setNodeValue("");
@@ -83,6 +99,23 @@ function BSTSection() {
     } catch (err) {
       console.error("BST remove error:", err);
       setErrorMessage("Error removing node.");
+    }
+  }
+
+  async function handleClear() {
+    setErrorMessage("");
+    try {
+      const res = await bstClear();
+      if (res.error) {
+        setErrorMessage(res.error);
+      } else {
+        // Clear local state
+        setBST(null);
+        setNodeValue("");
+      }
+    } catch (err) {
+      console.error("BST clear error:", err);
+      setErrorMessage("Error clearing BST.");
     }
   }
 
@@ -135,10 +168,10 @@ function BSTSection() {
               </h3>
               <p className="text-gray-700 text-base leading-relaxed mb-4">
                 A <strong>Binary Search Tree (BST)</strong> is a data structure
-                where for every node, values in the left subtree are less than the node’s
-                value and values in the right subtree are greater. Duplicate values
-                are not allowed and will return an error, and if you try to remove a
-                value that doesn’t exist, an error will be shown.
+                where for every node, values in the left subtree are less than
+                the node’s value and values in the right subtree are greater.
+                Duplicate values are not allowed, and removing a value that
+                doesn’t exist returns an error.
               </p>
               <button
                 onClick={toggleInfoModal}
@@ -151,7 +184,7 @@ function BSTSection() {
         )}
       </AnimatePresence>
 
-      {/* Insertion/Removal Section */}
+      {/* Control Panel */}
       <div className="mb-4 p-4 border rounded-md shadow-sm bg-white">
         <div className="flex flex-wrap items-center gap-4">
           <input
@@ -162,25 +195,32 @@ function BSTSection() {
             onChange={(e) => setNodeValue(e.target.value)}
           />
           <button
-            className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm font-semibold transition-colors duration-300"
+            className="bg-blue-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-blue-600 transition-colors duration-300"
             onClick={handleInsert}
           >
             <FaPlus />
             Insert
           </button>
           <button
-            className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm font-semibold transition-colors duration-300"
+            className="bg-red-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-red-600 transition-colors duration-300"
             onClick={handleRemove}
           >
             <FaTrash />
             Remove
           </button>
           <button
-            className="flex items-center gap-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm font-semibold transition-colors duration-300"
+            className="bg-gray-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-gray-600 transition-colors duration-300"
             onClick={fetchBSTData}
           >
             <FaSync className="animate-spin" />
             Refresh
+          </button>
+          <button
+            className="bg-gray-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-gray-600 transition-colors duration-300"
+            onClick={handleClear}
+          >
+            <FaTrash className="rotate-180" />
+            Clear
           </button>
         </div>
       </div>

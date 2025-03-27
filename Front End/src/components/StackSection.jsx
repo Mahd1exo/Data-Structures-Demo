@@ -1,6 +1,6 @@
 // src/components/StackSection.js
 import React, { useState, useEffect } from "react";
-import { fetchStack, pushStack, popStack } from "../services/api";
+import { fetchStack, pushStack, popStack, clearStack } from "../services/api";
 import { AnimatePresence, motion } from "framer-motion";
 import Tilt from "react-parallax-tilt";
 import {
@@ -11,6 +11,7 @@ import {
   FaChevronDown,
   FaChevronUp,
   FaSort,
+  FaTrash,
 } from "react-icons/fa";
 
 // Generate a unique ID for each stack item
@@ -34,7 +35,6 @@ function StackSection() {
     try {
       const data = await fetchStack();
       const rawArray = data.stack || [];
-      // Backend returns stack as [0 = TOP, ... last = BOTTOM]
       const mapped = rawArray.map((val) => ({ id: genId(), value: val }));
       setStackItems(mapped);
     } catch (err) {
@@ -70,7 +70,18 @@ function StackSection() {
     }
   }
 
-  // Toggles
+  async function handleClear() {
+    try {
+      const data = await clearStack();
+      const rawArray = data.stack || [];
+      const mapped = rawArray.map((val) => ({ id: genId(), value: val }));
+      setStackItems(mapped);
+    } catch (err) {
+      console.error("Error clearing stack:", err);
+      setErrorMessage("Error clearing stack.");
+    }
+  }
+
   function toggleExpand() {
     setIsExpanded((prev) => !prev);
   }
@@ -84,14 +95,13 @@ function StackSection() {
   // Prepare items for display based on reverse toggle
   const displayedItems = isReversed ? [...stackItems].reverse() : stackItems;
 
-  // Renders the stack: overlapping deck (collapsed) or vertical list (expanded)
   function renderStack() {
     if (!displayedItems.length) {
       return <p className="text-gray-500 text-center">Stack is empty</p>;
     }
 
     if (!isExpanded) {
-      // Overlapping deck view (small boxes)
+      // Overlapping deck view
       return (
         <div
           className="relative w-full max-w-md mx-auto overflow-visible"
@@ -195,7 +205,7 @@ function StackSection() {
 
   return (
     <div className="w-full p-6">
-      {/* Header: Left-Aligned Title, Right-Aligned Info Button */}
+      {/* Header: Title and Info Button */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-3xl font-bold text-gray-800 text-left">
           Stack Manager
@@ -208,6 +218,13 @@ function StackSection() {
         </button>
       </div>
 
+      {/* Global Error Message */}
+      {errorMessage && (
+        <div className="mb-4 p-2 border border-red-300 rounded text-red-600 text-sm">
+          {errorMessage}
+        </div>
+      )}
+
       {/* Info Modal */}
       <AnimatePresence>
         {showInfoModal && (
@@ -217,13 +234,10 @@ function StackSection() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            {/* Backdrop */}
             <div
               className="absolute inset-0 bg-black opacity-40"
               onClick={toggleInfoModal}
             ></div>
-
-            {/* Modal Content */}
             <motion.div
               className="relative bg-white rounded-xl p-6 max-w-xl mx-auto z-10 shadow-2xl"
               initial={{ scale: 0.8, y: -50 }}
@@ -235,10 +249,7 @@ function StackSection() {
                 About Stacks
               </h3>
               <p className="text-gray-700 text-base leading-relaxed mb-4">
-                A <strong>stack</strong> is a linear data structure that follows
-                the Last In, First Out (LIFO) principle. It is useful in scenarios
-                such as undo mechanisms, parsing, recursion, and more, where the most
-                recent item is needed first.
+                A <strong>stack</strong> is a linear data structure that follows the Last-In-First-Out (LIFO) principle.
               </p>
               <button
                 onClick={toggleInfoModal}
@@ -257,62 +268,59 @@ function StackSection() {
       </div>
 
       {/* Action Panel */}
-      <div className="mb-6 p-4 border-l-4 border-blue-500 bg-white shadow-sm rounded-r">
-        <h3 className="text-xl font-semibold text-gray-800 mb-2 text-left">
-          Stack Controls
-        </h3>
-        <div className="flex flex-wrap items-center gap-2">
-          <input
-            type="text"
-            placeholder="Enter value"
-            className="flex-1 border border-gray-300 p-3 rounded text-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-            value={inputValue}
-            onChange={(e) => {
-              setInputValue(e.target.value);
-              if (e.target.value.trim()) setErrorMessage("");
-            }}
-          />
-          <button
-            className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm font-semibold transition-colors duration-300"
-            onClick={handlePush}
-          >
-            <FaPlus />
-            Push
-          </button>
-          <button
-            className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm font-semibold transition-colors duration-300"
-            onClick={handlePop}
-          >
-            <FaMinus />
-            Pop
-          </button>
-          <button
-            className="flex items-center gap-1 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm font-semibold transition-colors duration-300"
-            onClick={handleFetch}
-          >
-            <FaSync className="animate-spin" />
-            Refresh
-          </button>
-          <button
-            className="flex items-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded text-sm font-semibold transition-colors duration-300"
-            onClick={toggleExpand}
-          >
-            {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
-            {isExpanded ? "Collapse" : "Expand"}
-          </button>
-          <button
-            className="flex items-center gap-1 bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded text-sm font-semibold transition-colors duration-300"
-            onClick={toggleReverse}
-          >
-            <FaSort />
-            {isReversed ? "Normal" : "Reverse"}
-          </button>
-        </div>
-        {errorMessage && (
-          <p className="mt-2 text-red-600 font-medium text-sm">
-            {errorMessage}
-          </p>
-        )}
+      <div className="mb-4 p-4 border rounded-md shadow-sm bg-white flex items-center gap-4">
+        <input
+          type="text"
+          placeholder="Enter value"
+          className="border border-gray-300 p-2 rounded flex-1 focus:outline-none focus:ring focus:ring-blue-300"
+          value={inputValue}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+            if (e.target.value.trim()) setErrorMessage("");
+          }}
+        />
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-blue-600 transition-colors duration-300"
+          onClick={handlePush}
+        >
+          <FaPlus />
+          Push
+        </button>
+        <button
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center gap-1 font-semibold transition-colors duration-300"
+          onClick={handlePop}
+        >
+          <FaMinus />
+          Pop
+        </button>
+        <button
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center gap-1 font-semibold transition-colors duration-300"
+          onClick={handleClear}
+        >
+          <FaTrash className="rotate-180" />
+          Clear
+        </button>
+        <button
+          className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded flex items-center gap-1 font-semibold transition-colors duration-300"
+          onClick={handleFetch}
+        >
+          <FaSync className="animate-spin" />
+          Refresh
+        </button>
+        <button
+          className="bg-green-800 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center gap-1 font-semibold transition-colors duration-300"
+          onClick={toggleExpand}
+        >
+          {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+          {isExpanded ? "Collapse" : "Expand"}
+        </button>
+        <button
+          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded flex items-center gap-1 font-semibold transition-colors duration-300"
+          onClick={toggleReverse}
+        >
+          <FaSort />
+          {isReversed ? "Normal" : "Reverse"}
+        </button>
       </div>
 
       {/* Stack Size Info */}

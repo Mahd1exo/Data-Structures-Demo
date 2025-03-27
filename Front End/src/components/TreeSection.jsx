@@ -1,6 +1,6 @@
 // src/components/TreeSection.js
 import React, { useRef, useState, useEffect } from "react";
-import { fetchTree, treeInsert, treeRemove, treeInsertChild } from "../services/api";
+import { fetchTree, treeInsert, treeRemove, treeInsertChild, treeClear } from "../services/api";
 import TreeNode from "./TreeNode";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaPlus, FaTrash, FaSync, FaInfoCircle } from "react-icons/fa";
@@ -75,6 +75,17 @@ function TreeSection() {
     }
   }
 
+  async function handleClear() {
+    try {
+      await treeClear();
+      // Optionally, you can also clear local state:
+      setTree(null);
+    } catch (err) {
+      console.error("Error clearing tree:", err);
+      setErrorMessage("Error clearing tree.");
+    }
+  }
+
   function toggleInfoModal() {
     setShowInfoModal((prev) => !prev);
   }
@@ -121,8 +132,7 @@ function TreeSection() {
             >
               <h3 className="text-2xl font-bold mb-4 text-gray-800">About Trees</h3>
               <p className="text-gray-700 text-base leading-relaxed mb-4">
-                A <strong>tree</strong> is a hierarchical data structure that
-                represents relationships in a parent-child form...
+                A <strong>tree</strong> is a hierarchical data structure that represents relationships in a parent-child form.
               </p>
               <button
                 onClick={toggleInfoModal}
@@ -149,12 +159,12 @@ function TreeSection() {
           <input
             type="text"
             placeholder="Parent ID (optional)"
-            className="flex-1 border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-blue-300 max-w-xs"
+            className="flex-1 border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
             value={insertParentId}
             onChange={(e) => setInsertParentId(e.target.value)}
           />
           <button
-            className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm font-semibold transition-colors duration-300"
+            className="bg-blue-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-blue-600 transition-colors duration-300"
             onClick={handleInsert}
           >
             <FaPlus />
@@ -170,19 +180,26 @@ function TreeSection() {
           <input
             type="text"
             placeholder="Enter node ID to remove"
-            className="flex-1 border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-red-300 max-w-xs"
+            className="flex-1 border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
             value={removeId}
             onChange={(e) => setRemoveId(e.target.value)}
           />
           <button
-            className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm font-semibold transition-colors duration-300"
+            className="bg-red-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-red-600 transition-colors duration-300"
             onClick={handleRemove}
           >
             <FaTrash />
             Remove by ID
           </button>
           <button
-            className="flex items-center gap-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm font-semibold transition-colors duration-300"
+            className="bg-gray-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-gray-600 transition-colors duration-300"
+            onClick={handleClear}
+          >
+            <FaTrash className="rotate-180" />
+            Clear
+          </button>
+          <button
+            className="bg-gray-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-gray-600 transition-colors duration-300"
             onClick={fetchTreeData}
           >
             <FaSync className="animate-spin" />
@@ -195,11 +212,10 @@ function TreeSection() {
       <div className="mb-2 text-sm text-gray-600">
         <strong>Tree Structure:</strong>
       </div>
-      {/* The container for the entire tree */}
       <div
         className="relative border rounded bg-gray-50 shadow-sm p-4 overflow-visible"
         ref={treeContainerRef}
-        style={{ minHeight: "400px" }} // for demonstration
+        style={{ minHeight: "400px" }}
       >
         {tree ? (
           <TreeNode

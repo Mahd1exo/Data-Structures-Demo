@@ -5,13 +5,13 @@
 
 /* BST Node structure */
 typedef struct BSTNode {
-    char value[BST_MAX_LEN];   /* Node value stored as a string */
+    char value[BST_MAX_LEN];   
     struct BSTNode* left;
     struct BSTNode* right;
-    int id;                    /* Unique id assigned at insertion */
+    int id;                    
 } BSTNode;
 
-/* Simple BST structure with a pointer to the root and a counter for unique ids */
+
 typedef struct {
     BSTNode* root;
     int nextId;

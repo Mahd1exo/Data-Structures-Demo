@@ -24,6 +24,7 @@ extern "C" {
     /* Returns array of char* [front -> array[0]]
        caller frees array, not strings themselves. */
     char** que_collect_data(const Queue* queue, int* count);
+    void que_clear(Queue* queue);
 
 #ifdef __cplusplus
 }

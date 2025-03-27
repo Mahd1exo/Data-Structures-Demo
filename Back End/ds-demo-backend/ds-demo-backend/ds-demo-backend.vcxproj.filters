@@ -13,66 +13,138 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\ds">
+      <UniqueIdentifier>{77ff1fb0-8a2e-4e0b-9f87-f78a8fc90933}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\routes">
+      <UniqueIdentifier>{ab98ed22-0bd8-47a5-9c40-a8504d7c9b72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ds">
+      <UniqueIdentifier>{56dde037-c397-415c-aa47-79ecce6ffc99}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="route_handlers.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ds_linkedlist.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ds_stack.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ds_queue.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ds_json_utils.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ds_tree.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ds_heap.c">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="ds_bst.c">
+      <Filter>Source Files\ds</Filter>
     </ClCompile>
     <ClCompile Include="ds_hashtable.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\ds</Filter>
     </ClCompile>
-    <ClCompile Include="ds_bst.c">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="ds_maxheap.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_linkedlist.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_queue.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_stack.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_tree.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="route_tree.c">
+      <Filter>Source Files\routes</Filter>
+    </ClCompile>
+    <ClCompile Include="route_stack.c">
+      <Filter>Source Files\routes</Filter>
+    </ClCompile>
+    <ClCompile Include="route_queue.c">
+      <Filter>Source Files\routes</Filter>
+    </ClCompile>
+    <ClCompile Include="route_linkedlist.c">
+      <Filter>Source Files\routes</Filter>
+    </ClCompile>
+    <ClCompile Include="route_maxheap.c">
+      <Filter>Source Files\routes</Filter>
+    </ClCompile>
+    <ClCompile Include="route_hash.c">
+      <Filter>Source Files\routes</Filter>
+    </ClCompile>
+    <ClCompile Include="route_bst.c">
+      <Filter>Source Files\routes</Filter>
+    </ClCompile>
+    <ClCompile Include="route_handlers.c">
+      <Filter>Source Files\routes</Filter>
+    </ClCompile>
+    <ClCompile Include="route_globals.c">
+      <Filter>Source Files\routes</Filter>
+    </ClCompile>
+    <ClCompile Include="route_utils.c">
+      <Filter>Source Files\routes</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_avl.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="route_avl.c">
+      <Filter>Source Files\routes</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_minheap.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="route_minheap.c">
+      <Filter>Source Files\routes</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_sortedlist.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="route_sortedlist.c">
+      <Filter>Source Files\routes</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_circularlist.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="route_circularlist.c">
+      <Filter>Source Files\routes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="route_handlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ds_linkedlist.h">
+    <ClInclude Include="route_globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ds_stack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ds_queue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ds_json_utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ds_tree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ds_heap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ds_hashtable.h">
+    <ClInclude Include="route_utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ds_bst.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_hashtable.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_maxheap.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_queue.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_linkedlist.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_tree.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_stack.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_avl.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_minheap.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_sortedlist.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_circularlist.h">
+      <Filter>Header Files\ds</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

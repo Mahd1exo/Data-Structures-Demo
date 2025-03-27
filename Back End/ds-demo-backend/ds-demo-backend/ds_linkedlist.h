@@ -23,10 +23,10 @@ extern "C" {
     void ll_add_end(LinkedList* list, const char* value);
     void ll_remove_front(LinkedList* list);
     void ll_remove_end(LinkedList* list);
-
-    /* Returns an array of char* with all node data, along with a node count
-       The caller is responsible for freeing the array (but NOT the strings themselves). */
     char** ll_collect_data(const LinkedList* list, int* count);
+	void ll_clear(LinkedList* list);
+	void ll_add_by_index(LinkedList* list, const char* value, int index);
+	void ll_remove_by_index(LinkedList* list, int index);
 
 #ifdef __cplusplus
 }

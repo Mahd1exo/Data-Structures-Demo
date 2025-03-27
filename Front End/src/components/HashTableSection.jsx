@@ -5,6 +5,7 @@ import {
   hashInsert,
   hashRemove,
   hashContains,
+  clearHash, // added clearHash method
 } from "../services/api";
 import Tilt from "react-parallax-tilt";
 import { AnimatePresence, motion } from "framer-motion";
@@ -164,6 +165,23 @@ function HashTableSection() {
     }
   }
 
+  // Handle clearing the entire hash table
+  async function handleClear() {
+    setErrorMessage("");
+    try {
+      await clearHash();
+      // Optionally reset all related states
+      setInsertKey("");
+      setInsertValue("");
+      setHashCalculation("");
+      setContainsResult(null);
+      refreshHash();
+    } catch (err) {
+      console.error("Error clearing hash table:", err);
+      setErrorMessage("Error clearing hash table.");
+    }
+  }
+
   // Build buckets: each key-value pair goes to bucket index = (sum of key ASCII codes) % 16
   function buildBuckets() {
     const buckets = Array.from({ length: 16 }, () => []);
@@ -228,11 +246,11 @@ function HashTableSection() {
                 About Hash Tables
               </h3>
               <p className="text-gray-700 text-base leading-relaxed mb-4">
-                A <strong>hash table</strong> stores key-value pairs and uses a hash
-                function to compute an index into an array of buckets. It offers efficient
-                lookups, insertions, and deletions. In this implementation, the bucket
-                for each key is determined by summing the ASCII codes of its characters and
-                taking the modulo with 16.
+                A <strong>hash table</strong> stores key-value pairs and uses a
+                hash function to compute an index into an array of buckets. It
+                offers efficient lookups, insertions, and deletions. In this
+                implementation, the bucket for each key is determined by summing
+                the ASCII codes of its characters and taking the modulo with 16.
               </p>
               <button
                 onClick={toggleInfoModal}
@@ -250,7 +268,7 @@ function HashTableSection() {
         <h3 className="text-lg font-medium text-gray-700 border-b pb-1 mb-3">
           Insert Key-Value Pair
         </h3>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
           <input
             type="text"
             placeholder="Key"
@@ -266,14 +284,14 @@ function HashTableSection() {
             onChange={handleInsertValueChange}
           />
           <button
-            className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm font-semibold transition-colors duration-300"
+            className="bg-blue-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-blue-600 transition-colors duration-300"
             onClick={handleInsert}
           >
             <FaPlus />
             Insert
           </button>
           <button
-            className="flex items-center gap-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm font-semibold transition-colors duration-300"
+            className="bg-gray-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-gray-600 transition-colors duration-300"
             onClick={() => {
               setInsertKey("");
               setInsertValue("");
@@ -282,6 +300,13 @@ function HashTableSection() {
           >
             <FaTimes />
             Clear
+          </button>
+          <button
+            className="bg-gray-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-gray-600 transition-colors duration-300"
+            onClick={handleClear}
+          >
+            <FaTrash className="rotate-180" />
+            Clear Table
           </button>
         </div>
         {hashCalculation && (
@@ -308,7 +333,7 @@ function HashTableSection() {
                 onChange={handleContainsKeyChange}
               />
               <button
-                className="flex items-center gap-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm font-semibold transition-colors duration-300"
+                className="bg-gray-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-gray-600 transition-colors duration-300"
                 onClick={handleContains}
               >
                 <FaSearch />
@@ -335,7 +360,7 @@ function HashTableSection() {
                 onChange={(e) => setRemoveKey(e.target.value)}
               />
               <button
-                className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm font-semibold transition-colors duration-300"
+                className="bg-red-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-red-600 transition-colors duration-300"
                 onClick={handleRemove}
               >
                 <FaTrash />
