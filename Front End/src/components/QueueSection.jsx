@@ -1,8 +1,13 @@
 // src/components/QueueSection.js
 import React, { useState, useEffect } from "react";
-import { fetchQueue, enqueue as enqueueApi, dequeue as dequeueApi } from "../services/api";
+import { 
+  fetchQueue, 
+  enqueue as enqueueApi, 
+  dequeue as dequeueApi,
+  clearQueue  // import clearQueue from API
+} from "../services/api";
 import { AnimatePresence, motion } from "framer-motion";
-import { FaArrowRight, FaPlus, FaMinus, FaSync, FaInfoCircle } from "react-icons/fa";
+import { FaArrowRight, FaPlus, FaMinus, FaSync, FaInfoCircle, FaTrash } from "react-icons/fa";
 
 function genId() {
   return Date.now().toString(36) + Math.random().toString(36).substring(2);
@@ -66,6 +71,17 @@ function QueueSection() {
     }
   }
 
+  async function handleClear() {
+    try {
+      await clearQueue();
+      setInputValue("");
+      handleFetch();
+    } catch (err) {
+      console.error("Error clearing queue:", err);
+      setErrorMessage("Error clearing queue.");
+    }
+  }
+
   function toggleInfoModal() {
     setShowInfoModal((prev) => !prev);
   }
@@ -74,7 +90,7 @@ function QueueSection() {
     <div className="w-full p-6">
       {/* Header: Left-Aligned Title, Right-Aligned Info Button */}
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold text-gray-800">Queue (Left → Right)</h2>
+        <h2 className="text-3xl font-bold text-gray-800 text-left">Queue (Left → Right)</h2>
         <button
           onClick={toggleInfoModal}
           className="flex items-center gap-1 text-gray-600 hover:text-gray-800 transition-colors duration-300"
@@ -113,8 +129,7 @@ function QueueSection() {
               <h3 className="text-2xl font-bold mb-4 text-gray-800">About Queues</h3>
               <p className="text-gray-700 text-base leading-relaxed mb-4">
                 A <strong>queue</strong> is a linear data structure that follows the First In, First Out (FIFO) principle.
-                Items are added at the rear and removed from the front, which is perfect for scenarios like task scheduling
-                or buffering.
+                Items are added at the rear and removed from the front, which is perfect for scenarios like task scheduling or buffering.
               </p>
               <button
                 onClick={toggleInfoModal}
@@ -127,41 +142,46 @@ function QueueSection() {
         )}
       </AnimatePresence>
 
-      {/* Action Panel */}
-      <div className="flex flex-col items-center mb-4 gap-2">
-        <div className="flex flex-wrap items-center gap-2 justify-center">
-          <input
-            type="text"
-            placeholder="Enter value"
-            className="border border-gray-300 p-2 rounded text-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-            value={inputValue}
-            onChange={(e) => {
-              setInputValue(e.target.value);
-              if (e.target.value.trim()) setErrorMessage("");
-            }}
-          />
-          <button
-            className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm font-semibold transition-colors duration-300"
-            onClick={handleEnqueue}
-          >
-            <FaPlus />
-            Enqueue
-          </button>
-          <button
-            className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm font-semibold transition-colors duration-300"
-            onClick={handleDequeue}
-          >
-            <FaMinus />
-            Dequeue
-          </button>
-          <button
-            className="flex items-center gap-1 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm font-semibold transition-colors duration-300"
-            onClick={handleFetch}
-          >
-            <FaSync className="animate-spin" />
-            Refresh
-          </button>
-        </div>
+      {/* Action Panel: All controls in a single row */}
+      <div className="mb-4 p-4 border rounded-md shadow-sm bg-white flex flex-wrap items-center gap-2 justify-center">
+        <input
+          type="text"
+          placeholder="Enter value"
+          className="flex-grow border border-gray-300 p-2 rounded text-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          value={inputValue}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+            if (e.target.value.trim()) setErrorMessage("");
+          }}
+        />
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-blue-600 transition-colors duration-300"
+          onClick={handleEnqueue}
+        >
+          <FaPlus />
+          Enqueue
+        </button>
+        <button
+          className="bg-red-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-red-600 transition-colors duration-300"
+          onClick={handleDequeue}
+        >
+          <FaMinus />
+          Dequeue
+        </button>
+        <button
+          className="bg-gray-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-gray-600 transition-colors duration-300"
+          onClick={handleFetch}
+        >
+          <FaSync className="animate-spin" />
+          Refresh
+        </button>
+        <button
+          className="bg-gray-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-gray-600 transition-colors duration-300"
+          onClick={handleClear}
+        >
+          <FaTrash className="rotate-180" />
+          Clear
+        </button>
       </div>
 
       {/* Size Info */}

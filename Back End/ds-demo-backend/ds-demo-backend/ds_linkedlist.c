@@ -33,7 +33,6 @@ void ll_add_end(LinkedList* list, const char* value) {
     if (!node) return;
     safeCopy(node->data, value, LL_MAX_DATA_LEN);
     node->next = NULL;
-
     if (!list->head) {
         list->head = node;
     }
@@ -41,6 +40,32 @@ void ll_add_end(LinkedList* list, const char* value) {
         LLNode* temp = list->head;
         while (temp->next) temp = temp->next;
         temp->next = node;
+    }
+}
+
+void ll_add_by_index(LinkedList* list, const char* value, int index) {
+    if (!list) return;
+    if (index <= 0) {
+        ll_add_front(list, value);
+        return;
+    }
+    LLNode* node = (LLNode*)malloc(sizeof(LLNode));
+    if (!node) return;
+    safeCopy(node->data, value, LL_MAX_DATA_LEN);
+    node->next = NULL;
+
+    LLNode* current = list->head;
+    int currentIndex = 0;
+    while (current && currentIndex < index - 1) {
+        current = current->next;
+        currentIndex++;
+    }
+    if (!current) {
+        ll_add_end(list, value);
+    }
+    else {
+        node->next = current->next;
+        current->next = node;
     }
 }
 
@@ -53,9 +78,7 @@ void ll_remove_front(LinkedList* list) {
 
 void ll_remove_end(LinkedList* list) {
     if (!list || !list->head) return;
-
     if (!list->head->next) {
-        /* only one node */
         free(list->head);
         list->head = NULL;
         return;
@@ -70,6 +93,33 @@ void ll_remove_end(LinkedList* list) {
     free(curr);
 }
 
+void ll_remove_by_index(LinkedList* list, int index) {
+    if (!list || !list->head) return;
+    if (index <= 0) {
+        ll_remove_front(list);
+        return;
+    }
+    LLNode* prev = list->head;
+    LLNode* curr = list->head->next;
+    int currentIndex = 1;
+    while (curr && currentIndex < index) {
+        prev = curr;
+        curr = curr->next;
+        currentIndex++;
+    }
+    if (curr) {
+        prev->next = curr->next;
+        free(curr);
+    }
+}
+
+void ll_clear(LinkedList* list) {
+    if (!list) return;
+    while (list->head) {
+        ll_remove_front(list);
+    }
+}
+
 char** ll_collect_data(const LinkedList* list, int* count) {
     if (!list) {
         if (count) *count = 0;
@@ -82,7 +132,6 @@ char** ll_collect_data(const LinkedList* list, int* count) {
         temp = temp->next;
     }
     if (count) *count = c;
-
     if (c == 0) {
         return NULL;
     }
@@ -93,7 +142,7 @@ char** ll_collect_data(const LinkedList* list, int* count) {
     }
     temp = list->head;
     for (int i = 0; i < c; i++) {
-        array[i] = temp->data; // pointing directly to node's data
+        array[i] = temp->data;
         temp = temp->next;
     }
     return array;

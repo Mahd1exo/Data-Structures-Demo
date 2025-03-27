@@ -19,6 +19,7 @@ extern "C" {
     void stk_init(Stack* stack);
     void stk_push(Stack* stack, const char* value);
     void stk_pop(Stack* stack);
+	void stk_clear(Stack* stack);
 
     /* Returns array of char* [stack top is array[0]]
        caller frees array, not strings themselves. */

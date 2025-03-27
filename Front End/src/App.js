@@ -8,9 +8,14 @@ import Tabs from "./components/Tabs";
 import LinkedListSection from "./components/LinkedListSection";
 import StackSection from "./components/StackSection";
 import QueueSection from "./components/QueueSection";
+import SortedListSection from "./components/SortedListSection";
+import CircularListSection from "./components/CircularListSection";
 import HeapSection from "./components/HeapSection";
+import MinHeapSection from "./components/MinHeapSection";
 import HashTableSection from "./components/HashTableSection";
 import TreeSection from "./components/TreeSection";
+import BSTSection from "./components/BSTSection";
+import AVLSection from "./components/AVLSection";
 
 function App() {
   const [activeTab, setActiveTab] = useState("list");
@@ -66,6 +71,30 @@ function App() {
                 <QueueSection />
               </motion.div>
             )}
+            {activeTab === "sorted" && (
+              <motion.div
+                key="sorted"
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={{ duration: 0.3 }}
+              >
+                <SortedListSection />
+              </motion.div>
+            )}
+            {activeTab === "circular" && (
+              <motion.div
+                key="circular"
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={{ duration: 0.3 }}
+              >
+                <CircularListSection />
+              </motion.div>
+            )}
             {activeTab === "heap" && (
               <motion.div
                 key="heap"
@@ -76,6 +105,18 @@ function App() {
                 transition={{ duration: 0.3 }}
               >
                 <HeapSection />
+              </motion.div>
+            )}
+            {activeTab === "minheap" && (
+              <motion.div
+                key="minheap"
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={{ duration: 0.3 }}
+              >
+                <MinHeapSection />
               </motion.div>
             )}
             {activeTab === "hash" && (
@@ -100,6 +141,30 @@ function App() {
                 transition={{ duration: 0.3 }}
               >
                 <TreeSection />
+              </motion.div>
+            )}
+            {activeTab === "bst" && (
+              <motion.div
+                key="bst"
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={{ duration: 0.3 }}
+              >
+                <BSTSection />
+              </motion.div>
+            )}
+            {activeTab === "avl" && (
+              <motion.div
+                key="avl"
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={{ duration: 0.3 }}
+              >
+                <AVLSection />
               </motion.div>
             )}
           </AnimatePresence>

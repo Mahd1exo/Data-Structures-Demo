@@ -46,6 +46,14 @@ void que_dequeue(Queue* queue) {
     free(temp);
 }
 
+void que_clear(Queue* queue) {
+    if (!queue) return;
+    while (queue->front) {
+        que_dequeue(queue);
+    }
+    queue->rear = NULL;
+}
+
 char** que_collect_data(const Queue* queue, int* count) {
     if (!queue) {
         if (count) *count = 0;

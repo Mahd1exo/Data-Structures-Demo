@@ -4,12 +4,20 @@ import {
   fetchLinkedList,
   addFrontLinkedList,
   addEndLinkedList,
+  addByIndexLinkedList,
   removeFrontLinkedList,
   removeEndLinkedList,
   removeByIndexLinkedList,
+  clearLinkedList,
 } from "../services/api";
 import { AnimatePresence, motion } from "framer-motion";
-import { FaPlus, FaTrash, FaSync, FaInfoCircle, FaArrowRight } from "react-icons/fa";
+import {
+  FaPlus,
+  FaTrash,
+  FaSync,
+  FaInfoCircle,
+  FaArrowRight,
+} from "react-icons/fa";
 
 // Generate a unique ID for local mapping
 function genId() {
@@ -19,6 +27,7 @@ function genId() {
 function LinkedListSection() {
   const [list, setList] = useState([]);
   const [inputValue, setInputValue] = useState("");
+  const [addIndex, setAddIndex] = useState("");
   const [removeIndex, setRemoveIndex] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -42,7 +51,21 @@ function LinkedListSection() {
     }
   }
 
-  // Add at front with input validation
+  // Clear the entire linked list
+  async function handleClear() {
+    setErrorMessage("");
+    try {
+      const data = await clearLinkedList();
+      const rawArray = data.list || [];
+      const mapped = rawArray.map((val) => ({ id: genId(), value: val }));
+      setList(mapped);
+    } catch (err) {
+      console.error("Error clearing linked list:", err);
+      setErrorMessage("Error clearing linked list.");
+    }
+  }
+
+  // Add at front with validation
   async function handleAddFront() {
     const value = inputValue.trim();
     if (!value) {
@@ -66,7 +89,7 @@ function LinkedListSection() {
     }
   }
 
-  // Add at end with input validation
+  // Add at end with validation
   async function handleAddEnd() {
     const value = inputValue.trim();
     if (!value) {
@@ -87,6 +110,37 @@ function LinkedListSection() {
     } catch (err) {
       console.error("Error adding to end:", err);
       setErrorMessage("Error adding value to end.");
+    }
+  }
+
+  // Add by index: requires both an index and a value
+  async function handleAddByIndex() {
+    const value = inputValue.trim();
+    const idx = addIndex.trim();
+    if (!value) {
+      setErrorMessage("Please enter a valid value to add.");
+      return;
+    }
+    if (!idx || isNaN(idx)) {
+      setErrorMessage("Please enter a valid numeric index for insertion.");
+      return;
+    }
+    if (value.length > 16) {
+      setErrorMessage("Value must be 16 characters or less.");
+      return;
+    }
+    setErrorMessage("");
+    const indexNum = parseInt(idx, 10);
+    try {
+      const data = await addByIndexLinkedList(indexNum, value);
+      const rawArray = data.list || [];
+      const mapped = rawArray.map((val) => ({ id: genId(), value: val }));
+      setList(mapped);
+      setInputValue("");
+      setAddIndex("");
+    } catch (err) {
+      console.error("Error adding by index:", err);
+      setErrorMessage("Error adding value by index.");
     }
   }
 
@@ -153,7 +207,7 @@ function LinkedListSection() {
 
   return (
     <div className="w-full p-6">
-      {/* Header: Left-Aligned Title, Right-Aligned Info Button */}
+      {/* Header: Title and Info Button */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-3xl font-bold text-gray-800">Linked List</h2>
         <button
@@ -195,85 +249,116 @@ function LinkedListSection() {
                 About Linked Lists
               </h3>
               <p className="text-gray-700 text-base leading-relaxed mb-4">
-                A <strong>linked list</strong> is a linear data structure where each node contains a value and a reference to the next node.
-                It allows efficient insertions and deletions at either end. Use the controls below to add or remove nodes.
+                A <strong>linked list</strong> is a linear data structure where each node
+                contains a value and a reference to the next node. It allows efficient
+                insertions and deletions at either end as well as at a specified position.
               </p>
               <button
                 onClick={toggleInfoModal}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded transition-colors duration-300"
+                className="ml- bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded transition-colors duration-300"
               >
                 Close
               </button>
+
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Action Panel */}
-      <div className="mb-4 p-4 border rounded-md shadow-sm bg-white">
-        <h3 className="text-xl font-semibold text-gray-800 mb-2 text-left">
-          Linked List Controls
-        </h3>
-        <div className="flex flex-wrap items-center gap-2">
+      {/* Combined Control Row */}
+      <div className="mb-4 p-4 border rounded-md shadow-sm bg-white flex flex-col gap-4">
+        {/* First Row: Add Controls */}
+        <div className="flex w-full items-center gap-4">
+          <input
+            type="text"
+            placeholder="Index for Add (optional)"
+            className="w-1/4 border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
+            value={addIndex}
+            onChange={(e) => setAddIndex(e.target.value)}
+          />
           <input
             type="text"
             placeholder="Enter value"
-            className="flex-1 border border-gray-300 p-3 rounded text-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-1/4 border border-gray-300 p-2 rounded text-lg focus:outline-none focus:ring focus:ring-blue-300"
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
               if (e.target.value.trim()) setErrorMessage("");
             }}
           />
-          <button
-            className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm font-semibold transition-colors duration-300"
-            onClick={handleAddFront}
-          >
-            <FaPlus />
-            Add Front
-          </button>
-          <button
-            className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm font-semibold transition-colors duration-300"
-            onClick={handleAddEnd}
-          >
-            <FaPlus />
-            Add End
-          </button>
-          <button
-            className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm font-semibold transition-colors duration-300"
-            onClick={handleRemoveFront}
-          >
-            <FaTrash />
-            Remove Front
-          </button>
-          <button
-            className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm font-semibold transition-colors duration-300"
-            onClick={handleRemoveEnd}
-          >
-            <FaTrash />
-            Remove End
-          </button>
+          <div className="flex-1 flex gap-2">
+            <button
+              className="flex-1 flex items-center justify-center gap-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-base font-semibold transition-colors duration-300 px-4 py-3"
+              onClick={handleAddFront}
+            >
+              <FaPlus />
+              Add Front
+            </button>
+            <button
+              className="flex-1 flex items-center justify-center gap-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-base font-semibold transition-colors duration-300 px-4 py-3"
+              onClick={handleAddEnd}
+            >
+              <FaPlus />
+              Add End
+            </button>
+            <button
+              className="flex-1 flex items-center justify-center gap-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-base font-semibold transition-colors duration-300 px-4 py-3"
+              onClick={handleAddByIndex}
+            >
+              <FaPlus />
+              Add by Index
+            </button>
+          </div>
+        </div>
+        {/* Second Row: Remove Controls */}
+        <div className="flex w-full items-center gap-4">
           <input
             type="text"
             placeholder="Index to remove"
-            className="flex-1 border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-red-300 max-w-xs"
+            className="w-1/4 border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-red-300"
             value={removeIndex}
             onChange={(e) => setRemoveIndex(e.target.value)}
           />
-          <button
-            className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm font-semibold transition-colors duration-300"
-            onClick={handleRemoveByIndex}
-          >
-            <FaTrash />
-            Remove by Index
-          </button>
-          <button
-            className="flex items-center gap-1 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm font-semibold transition-colors duration-300"
-            onClick={handleFetch}
-          >
-            <FaSync className="animate-spin" />
-            Refresh
-          </button>
+          <div className="flex-1 flex gap-2">
+            <button
+              className="flex-1 flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white rounded text-base font-semibold transition-colors duration-300 px-4 py-3"
+              onClick={handleRemoveFront}
+            >
+              <FaTrash />
+              Remove Front
+            </button>
+            <button
+              className="flex-1 flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white rounded text-base font-semibold transition-colors duration-300 px-4 py-3"
+              onClick={handleRemoveEnd}
+            >
+              <FaTrash />
+              Remove End
+            </button>
+            <button
+              className="flex-1 flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white rounded text-base font-semibold transition-colors duration-300 px-4 py-3"
+              onClick={handleRemoveByIndex}
+            >
+              <FaTrash />
+              Remove by Index
+            </button>
+          </div>
+          {/* Wrap Refresh and Clear in a container that's half the width */}
+          <div className="w-1/4 flex gap-2">
+            <button
+              className="flex-1 flex items-center justify-center gap-1 bg-gray-500 hover:bg-gray-600 text-white rounded text-base font-semibold transition-colors duration-300 px-2 py-3"
+              onClick={handleFetch}
+            >
+              <FaSync className="animate-spin" />
+              Refresh
+            </button>
+            <button
+              className="flex-1 flex items-center justify-center gap-1 bg-gray-500 hover:bg-gray-600 text-white rounded text-base font-semibold transition-colors duration-300 px-2 py-3"
+              onClick={handleClear}
+            >
+              <FaTrash className="rotate-180" />
+              Clear
+            </button>
+          </div>
         </div>
       </div>
 
@@ -302,7 +387,9 @@ function LinkedListSection() {
                   layout
                   className="flex flex-row items-center gap-2 mx-2 my-4"
                 >
-                  {isHead && <div className="text-sm text-gray-700">Head</div>}
+                  {isHead && (
+                    <div className="text-sm text-gray-700">Head</div>
+                  )}
                   <div className="text-sm text-gray-600">Index: {i}</div>
                   <div className="bg-blue-600 text-white px-4 py-2 rounded shadow min-w-[4rem] text-center text-lg font-bold">
                     {node.value}
