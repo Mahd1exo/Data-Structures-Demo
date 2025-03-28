@@ -10,24 +10,21 @@
 char log_buffer[LOG_BUFFER_SIZE] = "";
 int log_buffer_offset = 0;
 
-// Append a message to the in-memory log buffer.
+
 void append_to_log_buffer(const char* message) {
     if (message == NULL)
         return;
     int len = (int)strlen(message);
     if (log_buffer_offset + len < LOG_BUFFER_SIZE - 1) {
-        // Append message to buffer.
         strcpy(&log_buffer[log_buffer_offset], message);
         log_buffer_offset += len;
     }
-    // Otherwise, you may choose to rotate or truncate the buffer.
 }
 
-// Custom access log callback for CivetWeb. This is called for every request.
+// Custom access log callback for CivetWeb.
 int my_log_access(const struct mg_connection* conn, const char* message) {
     append_to_log_buffer(message);
     append_to_log_buffer("\n");
-    // Return 0 so CivetWeb does not output its default log message.
     return 0;
 }
 
@@ -40,7 +37,6 @@ void show_logs(void) {
         printf("\n=========== END LOGS ===========\n");
         printf("Press 'q' to return to main menu...\n");
 
-        // Check if user pressed 'q' or 'Q'
         if (_kbhit()) {
             char ch = _getch();
             if (ch == 'q' || ch == 'Q') {

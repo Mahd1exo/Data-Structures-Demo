@@ -1,32 +1,29 @@
 #define _CRTDBG_MAP_ALLOC
 #define _CRT_SECURE_NO_WARNINGS
-
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <stdio.h>
-#include <string.h>
-#include <civetweb.h>
 #include <stdbool.h>
 #include <conio.h>
 #include <windows.h>
 
-#include "route_handlers.h"
-#include "task_queue.h"
-#include "stack_ops.h"  
+#include <civetweb.h>
+#include "server_start.h"      // For start_server()
+#include "cleanup.h"           // For cleanup_and_check_leaks()
+#include "logging.h"           // For show_logs(), etc.
+#include "task_queue.h"        // For TaskQueue usage
+#include "stack_ops.h"         // For stack usage
+#include "route_handlers.h"    // For register_endpoints
 
-#include "cleanup.h"
-#include "logging.h"
-#include "server_start.h" 
-
-// Enum for main menu options.
+// Enum for menu options
 enum MenuOption {
     EXIT = 1,
-    SHOW_LOGS = 2,
-    SHOW_HISTORY = 3,
+    SHOW_LOGS,
+    SHOW_HISTORY,
     CLEAN_MEMORY = 1234
 };
 
-// Helper: Process tasks in a task queue.
+// Helper: Process tasks in a task queue
 static void process_task_queue(TaskQueue* queue) {
     void* taskContext = NULL;
     task_func_t task;
@@ -35,7 +32,8 @@ static void process_task_queue(TaskQueue* queue) {
     }
 }
 
-static void menu() {
+// Display a small menu
+static void show_menu(void) {
     printf("\n======== DEBUGGING MENU ========\n");
     printf("1. Exit server and check for memory leaks\n");
     printf("2. Show logs (view in-memory log buffer)\n");
@@ -46,16 +44,19 @@ static void menu() {
 }
 
 int main(int argc, char* argv[]) {
+    // Initial memory snapshot for leak detection
     _CrtMemState initialState;
     _CrtMemCheckpoint(&initialState);
 
+    // A main task queue
     TaskQueue mainQueue;
     task_queue_init(&mainQueue);
 
+    // A stack to keep track of commands (optional)
     Stack commandStack;
     stack_init(&commandStack);
 
-    // CivetWeb options.
+    // CivetWeb server options
     const char* options[] = {
         "listening_ports", "8080",
         "num_threads", "2",
@@ -63,9 +64,9 @@ int main(int argc, char* argv[]) {
         NULL
     };
 
-    // Start the server using the dedicated module.
-    struct mg_context* ctx = start_server(options);
-    if (!ctx) {
+    // Start the server (returns both ctx and callbacks)
+    ServerResources resources = start_server(options);
+    if (!resources.ctx) {
         printf("Error: Could not start server.\n");
         return 1;
     }
@@ -73,10 +74,12 @@ int main(int argc, char* argv[]) {
 
     bool exitFlag = false;
     while (!exitFlag) {
-		menu();
+        show_menu();
+
         int option;
         if (scanf("%d", &option) != 1) {
-            while (getchar() != '\n');  // Clear invalid input.
+            // Clear invalid input
+            while (getchar() != '\n');
             continue;
         }
 
@@ -84,34 +87,44 @@ int main(int argc, char* argv[]) {
         case EXIT:
             exitFlag = true;
             break;
+
         case SHOW_LOGS:
+            // Add a command to the stack
             stack_push(&commandStack, "Show Logs");
+            // Enqueue a task to show logs
             task_queue_enqueue(&mainQueue, (task_func_t)show_logs, NULL);
             break;
+
         case SHOW_HISTORY:
             stack_push(&commandStack, "Show Operation History");
+            // Print the stack of commands
             task_queue_enqueue(&mainQueue, (task_func_t)print_stack, &commandStack);
             break;
+
         case CLEAN_MEMORY:
             stack_push(&commandStack, "Starting Cleaning Memory...");
             task_queue_enqueue(&mainQueue, (task_func_t)clear_all_data_structures, NULL);
             task_queue_enqueue(&mainQueue, (task_func_t)printf, "Memory cleaned.\n");
-            task_queue_enqueue(&mainQueue, (task_func_t)printf, "NOTE: After cleaning memory, you must reinitialize some data structures.\n");
+            task_queue_enqueue(&mainQueue, (task_func_t)printf, "NOTE: After cleaning memory, you must reinitialize data structures.\n");
             stack_push(&commandStack, "Cleaned Memory");
             break;
+
         default:
-			stack_push(&commandStack, "Invalid Option");
+            stack_push(&commandStack, "Invalid Option");
             task_queue_enqueue(&mainQueue, (task_func_t)printf, "Invalid option. Please try again.\n");
             break;
         }
+
+        // Process any enqueued tasks
         process_task_queue(&mainQueue);
     }
 
-    // Shutdown the server and check for memory leaks using a task queue.
-    cleanup_and_check_leaks(ctx, &initialState);
-
-    // Free the operation history stack.
+    // Clean up the main queue and stack
+    task_queue_clear(&mainQueue);
     stack_free(&commandStack);
+
+    // Final cleanup: stop the server, free callbacks, check for leaks
+    cleanup_and_check_leaks(resources, &initialState);
 
     return 0;
 }

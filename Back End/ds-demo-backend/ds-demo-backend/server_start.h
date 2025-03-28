@@ -3,8 +3,11 @@
 
 #include <civetweb.h>
 
-// Function to start the server.
-// Takes the server options (an array of strings) and returns the server context.
-struct mg_context* start_server(const char** options);
+typedef struct ServerResources {
+    struct mg_context* ctx;
+    struct mg_callbacks* callbacks;
+} ServerResources;
 
-#endif // SERVER_START_H
+ServerResources start_server(const char** options);
+
+#endif  // SERVER_START_H

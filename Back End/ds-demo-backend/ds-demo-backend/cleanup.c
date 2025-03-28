@@ -1,11 +1,12 @@
 #define _CRTDBG_MAP_ALLOC
 #define _CRT_SECURE_NO_WARNINGS
-#include <stdio.h>
-#include <civetweb.h>
 #include "cleanup.h"
 #include "task_queue.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <civetweb.h>
 
-// Helper: Print a message (used as a task in the cleanup task queue).
+// Helper: Print a message (used as a task in the cleanup queue)
 static void print_message(void* context) {
     const char* msg = (const char*)context;
     if (msg) {
@@ -13,7 +14,7 @@ static void print_message(void* context) {
     }
 }
 
-// Helper to process a task queue.
+// Helper to process a task queue
 static void process_task_queue(TaskQueue* queue) {
     void* taskContext = NULL;
     task_func_t task;
@@ -22,23 +23,35 @@ static void process_task_queue(TaskQueue* queue) {
     }
 }
 
-// Cleanup function: stops the server, calls mg_exit_library, clears data structures,
-// prints messages, and then checks for memory leaks.
-void cleanup_and_check_leaks(struct mg_context* ctx, _CrtMemState* initialState) {
+
+// -------------------------------------------------------------------
+// The main cleanup function that stops the server, calls mg_exit_library,
+// frees the callbacks pointer, and checks for memory leaks.
+void cleanup_and_check_leaks(ServerResources resources, _CrtMemState* initialState) {
+    struct mg_context* ctx = resources.ctx;
+    struct mg_callbacks* callbacks = resources.callbacks;
+
     TaskQueue cleanupQueue;
     task_queue_init(&cleanupQueue);
 
-    // Enqueue shutdown tasks.
-    task_queue_enqueue(&cleanupQueue, (task_func_t)mg_stop, ctx);                // Stop the server.
+    // Stop the server and do other tasks
+    task_queue_enqueue(&cleanupQueue, (task_func_t)mg_stop, ctx);
     task_queue_enqueue(&cleanupQueue, print_message, "Server stopped.\n");
-    task_queue_enqueue(&cleanupQueue, (task_func_t)mg_exit_library, NULL);         // Exit CivetWeb library.
-    task_queue_enqueue(&cleanupQueue, (task_func_t)clear_all_data_structures, NULL); // Clear data structures.
+    task_queue_enqueue(&cleanupQueue, (task_func_t)mg_exit_library, NULL);
+    task_queue_enqueue(&cleanupQueue, (task_func_t)clear_all_data_structures, NULL);
     task_queue_enqueue(&cleanupQueue, print_message, "Data structures cleared.\n");
 
-    // Process all cleanup tasks.
+    // Process and clear the cleanup queue
     process_task_queue(&cleanupQueue);
+    task_queue_clear(&cleanupQueue);
 
-    // Take a final memory snapshot and compare.
+    // Now free the mg_callbacks pointer we allocated in start_server()
+    free(callbacks);
+    
+    int* leak = malloc(100);
+
+
+    // Final memory snapshot and leak check
     _CrtMemState finalState, diffState;
     _CrtMemCheckpoint(&finalState);
 
