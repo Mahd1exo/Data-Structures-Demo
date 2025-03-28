@@ -4,6 +4,8 @@
 #include <string.h>
 #include "ds_bst.h"
 
+
+// O(n)
 /* Helper: safely copy string with null termination */
 static void safeCopy(char* dest, const char* src, int maxLen) {
     if (!src) {

@@ -15,14 +15,14 @@ static int handle_circularlist_get(struct mg_connection* conn, void* cbdata) {
     if (items) free(items);
     send_json(conn, json ? json : "{ \"circularList\": [] }");
     if (json) free(json);
-    return 200;
+    return SUCCESS_RESPONSE_CODE;
 }
 
 /* POST: /api/circular-list/insert - default add at end */
 static int handle_circularlist_insert(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
-    char value[64];
+    char value[MAX_VALUE_LEN];
     if (extract_value_from_body(body, value, sizeof(value))) {
         cl_add_end(&g_circularlist, value);
     }
@@ -31,9 +31,9 @@ static int handle_circularlist_insert(struct mg_connection* conn, void* cbdata) 
 
 /* POST: /api/circular-list/insert-front */
 static int handle_circularlist_insert_front(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
-    char value[64];
+    char value[MAX_VALUE_LEN];
     if (extract_value_from_body(body, value, sizeof(value))) {
         cl_add_front(&g_circularlist, value);
     }
@@ -42,13 +42,13 @@ static int handle_circularlist_insert_front(struct mg_connection* conn, void* cb
 
 /* POST: /api/circular-list/insert-by-index */
 static int handle_circularlist_insert_by_index(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
-    char value[64];
+    char value[MAX_VALUE_LEN];
     int index = extract_index_from_body(body);
     if (index < 0) {
         send_json(conn, "{ \"error\": \"Missing or invalid index\" }");
-        return 400;
+        return FAILURE_RESPONSE_CODE;
     }
     if (extract_value_from_body(body, value, sizeof(value))) {
         cl_insert_by_index(&g_circularlist, value, index);
@@ -58,9 +58,9 @@ static int handle_circularlist_insert_by_index(struct mg_connection* conn, void*
 
 /* POST: /api/circular-list/remove - remove by value */
 static int handle_circularlist_remove(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
-    char value[64];
+    char value[MAX_VALUE_LEN];
     if (extract_value_from_body(body, value, sizeof(value))) {
         cl_remove(&g_circularlist, value);
     }
@@ -81,12 +81,12 @@ static int handle_circularlist_remove_end(struct mg_connection* conn, void* cbda
 
 /* DELETE: /api/circular-list/remove-by-index */
 static int handle_circularlist_remove_by_index(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
     int index = extract_index_from_body(body);
     if (index < 0) {
         send_json(conn, "{ \"error\": \"Missing or invalid index\" }");
-        return 400;
+        return FAILURE_RESPONSE_CODE;
     }
     cl_remove_by_index(&g_circularlist, index);
     return handle_circularlist_get(conn, NULL);

@@ -16,13 +16,13 @@ static int handle_get_queue(struct mg_connection* conn, void* cbdata) {
     send_json(conn, json ? json : "{ \"queue\": [] }");
     if (json)
         free(json);
-    return 200;
+    return SUCCESS_RESPONSE_CODE;
 }
 
 static int handle_post_queue_enqueue(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
-    char value[64];
+    char value[MAX_VALUE_LEN];
     if (extract_value_from_body(body, value, sizeof(value))) {
         que_enqueue(&g_queue, value);
     }

@@ -102,6 +102,15 @@
     <ClCompile Include="route_circularlist.c">
       <Filter>Source Files\routes</Filter>
     </ClCompile>
+    <ClCompile Include="task_queue.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="cleanup.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="logging.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="route_handlers.h">
@@ -145,6 +154,15 @@
     </ClInclude>
     <ClInclude Include="ds_circularlist.h">
       <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="task_queue.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="cleanup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="logging.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

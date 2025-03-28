@@ -1,47 +1,59 @@
 #define _CRTDBG_MAP_ALLOC
 #define _CRT_SECURE_NO_WARNINGS
+
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <stdio.h>
 #include <string.h>
 #include <civetweb.h>
+#include <stdbool.h>
+
 #include "route_handlers.h"
 
-// Forward declaration of cleanup function
-void clear_all_data_structures(void);
+#include "task_queue.h"
+#include "cleanup.h"
+#include "logging.h"
 
-static void cleanup_and_check_leaks(struct mg_context* ctx, _CrtMemState* initialState) {
-    mg_stop(ctx);
-    printf("Server stopped.\n");
-    mg_exit_library();
-    clear_all_data_structures();
-    printf("Data structures cleared.\n");
+// For non-blocking keyboard input and sleep on Windows.
+#include <conio.h>
+#include <windows.h>
 
-    _CrtMemState finalState, diffState;
-    _CrtMemCheckpoint(&finalState);
+// Enum for main menu options.
+enum MenuOption {
+    EXIT = 1,
+    SHOW_LOGS = 2,
+    CLEAN_MEMORY = 1234
+};
 
-    if (_CrtMemDifference(&diffState, initialState, &finalState)) {
-        printf("Memory leaks detected:\n");
-        _CrtDumpMemoryLeaks();
-    }
-    else {
-        printf("No memory leaks detected.\n");
+// Helper: Process tasks in a task queue.
+static void process_task_queue(TaskQueue* queue) {
+    void* taskContext = NULL;
+    task_func_t task;
+    while ((task = task_queue_dequeue(queue, &taskContext)) != NULL) {
+        task(taskContext);
     }
 }
 
 int main(int argc, char* argv[]) {
-    // Take a memory snapshot before starting the server
-    _CrtMemState s1;
-    _CrtMemCheckpoint(&s1);
+    _CrtMemState initialState;
+    _CrtMemCheckpoint(&initialState);
 
+    TaskQueue mainQueue;
+    task_queue_init(&mainQueue);
+
+    // CivetWeb options, including access_log_file for file logging.
     const char* options[] = {
         "listening_ports", "8080",
         "num_threads", "2",
+        "access_log_file", "access.log",
         NULL
     };
 
     struct mg_callbacks callbacks;
     memset(&callbacks, 0, sizeof(callbacks));
+
+    // Set our custom access log callback from the logging module.
+    callbacks.log_access = my_log_access;
 
     struct mg_context* ctx = mg_start(&callbacks, NULL, options);
     if (!ctx) {
@@ -49,42 +61,46 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    /* Register all endpoints */
+    // Register endpoints.
     register_endpoints(ctx);
-
     printf("Server started on port 8080.\n");
 
-    // Infinite loop until user chooses to exit
-    while (1) {
-        printf("\nMenu:\n");
+    bool exitFlag = false;
+    while (!exitFlag) {
+        printf("\n======== DEBUGGING MENU ========\n");
         printf("1. Exit server and check for memory leaks\n");
-        printf("2. Clean Memory\n");
+        printf("2. Show logs (view in-memory log buffer)\n");
+        printf("1234. Clean Memory (for testing; clears data structures)\n");
+        printf("!!! CLEAN MEMORY IS FOR TESTING MEMORY LEAKS, NOT FOR REGULAR OPERATION !!!\n");
         printf("Enter option: ");
 
         int option;
         if (scanf("%d", &option) != 1) {
-            // Clear invalid input
-            int ch;
-            while ((ch = getchar()) != '\n' && ch != EOF);
+            while (getchar() != '\n');  // Clear invalid input.
             continue;
         }
 
-        if (option == 1) {
-            // Break out of the loop to stop the server and do final checks
+        switch (option) {
+        case EXIT:
+            exitFlag = true;
+            break;
+        case SHOW_LOGS:
+            show_logs();
+            break;
+        case CLEAN_MEMORY:
+            task_queue_enqueue(&mainQueue, (task_func_t)clear_all_data_structures, NULL);
+            printf("Memory cleaned.\n");
+            printf("NOTE: After cleaning memory, you must reinitialize some data structures.\n");
+            break;
+        default:
+            printf("Invalid option. Please try again.\n");
             break;
         }
-        else if (option == 2) {
-            // Just clear your data structures without stopping the server
-            clear_all_data_structures();
-            printf("Data structures cleared.\n");
-        }
-        else {
-            printf("Invalid option. Please try again.\n");
-        }
+        process_task_queue(&mainQueue);
     }
 
-    // Cleanup server and check for leaks
-    cleanup_and_check_leaks(ctx, &s1);
+    // Shutdown the server and check for memory leaks.
+    cleanup_and_check_leaks(ctx, &initialState);
 
     return 0;
 }

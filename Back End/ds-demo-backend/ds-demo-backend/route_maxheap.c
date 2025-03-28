@@ -12,13 +12,13 @@ static int handle_heap_get(struct mg_connection* conn, void* cbdata) {
     send_json(conn, json ? json : "{ \"heap\": [] }");
     if (json)
         free(json);
-    return 200;
+    return SUCCESS_RESPONSE_CODE;
 }
 
 static int handle_heap_insert(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+	char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
-    char value[64];
+    char value[MAX_VALUE_LEN];
     if (extract_value_from_body(body, value, sizeof(value))) {
         int intValue = atoi(value);
         maxheap_insert(&g_heap, intValue);
