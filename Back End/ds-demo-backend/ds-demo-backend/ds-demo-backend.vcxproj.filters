@@ -111,6 +111,15 @@
     <ClCompile Include="logging.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="stack_ops.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="task_stack.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="server_start.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="route_handlers.h">
@@ -162,6 +171,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="logging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stack_ops.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="task_stack.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="server_start.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
