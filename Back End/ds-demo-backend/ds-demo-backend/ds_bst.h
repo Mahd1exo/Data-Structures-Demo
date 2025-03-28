@@ -10,11 +10,10 @@
 #ifndef DS_BST_H
 #define DS_BST_H
 
-#define BST_MAX_LEN 64
 
 /* BST Node structure */
 typedef struct BSTNode {
-    char value[BST_MAX_LEN];   
+    int data;   
     struct BSTNode* left;
     struct BSTNode* right;
     int id;                    

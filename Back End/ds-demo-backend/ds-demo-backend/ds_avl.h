@@ -10,10 +10,9 @@
 #ifndef DS_AVL_H
 #define DS_AVL_H
 
-#define AVL_MAX_LEN 64
 
 typedef struct AVLNode {
-    char data[AVL_MAX_LEN];
+    int data;
     int height;
     struct AVLNode* left;
     struct AVLNode* right;

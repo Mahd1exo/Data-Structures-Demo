@@ -8,8 +8,6 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
-
-
 void avl_init(SimpleAVL* tree) {
     if (!tree) return;
     tree->root = NULL;
@@ -62,8 +60,7 @@ static int getBalance(AVLNode* node) {
 static AVLNode* create_node(const char* value) {
     AVLNode* node = (AVLNode*)malloc(sizeof(AVLNode));
     if (!node) return NULL;
-    strncpy(node->data, value, AVL_MAX_LEN - 1);
-    node->data[AVL_MAX_LEN - 1] = '\0';
+    node->data = atoi(value);
     node->left = NULL;
     node->right = NULL;
     node->height = 1;
@@ -94,29 +91,34 @@ static AVLNode* avl_insert_node(AVLNode* node, const char* value) {
     if (!node) {
         return create_node(value);
     }
-    int cmp = strcmp(value, node->data);
-    if (cmp < 0) {
+    int newVal = atoi(value);
+    if (newVal < node->data) {
         node->left = avl_insert_node(node->left, value);
     }
-    else if (cmp > 0) {
+    else if (newVal > node->data) {
         node->right = avl_insert_node(node->right, value);
     }
     else {
-        strncpy(node->data, value, AVL_MAX_LEN - 1);
-        node->data[AVL_MAX_LEN - 1] = '\0';
+        // Duplicate value; do nothing.
         return node;
     }
+
     node->height = 1 + maxInt(height(node->left), height(node->right));
     int balance = getBalance(node);
-    if (balance > 1 && strcmp(value, node->left->data) < 0)
+
+    // Left Left Case
+    if (balance > 1 && newVal < node->left->data)
         return rightRotate(node);
-    if (balance < -1 && strcmp(value, node->right->data) > 0)
+    // Right Right Case
+    if (balance < -1 && newVal > node->right->data)
         return leftRotate(node);
-    if (balance > 1 && strcmp(value, node->left->data) > 0) {
+    // Left Right Case
+    if (balance > 1 && newVal > node->left->data) {
         node->left = leftRotate(node->left);
         return rightRotate(node);
     }
-    if (balance < -1 && strcmp(value, node->right->data) < 0) {
+    // Right Left Case
+    if (balance < -1 && newVal < node->right->data) {
         node->right = rightRotate(node->right);
         return leftRotate(node);
     }
@@ -133,43 +135,57 @@ static AVLNode* minValueNode(AVLNode* node) {
 
 static AVLNode* avl_remove_node(AVLNode* root, const char* value) {
     if (!root) return root;
-    int cmp = strcmp(value, root->data);
-    if (cmp < 0) {
+
+    int target = atoi(value);
+    if (target < root->data) {
         root->left = avl_remove_node(root->left, value);
     }
-    else if (cmp > 0) {
+    else if (target > root->data) {
         root->right = avl_remove_node(root->right, value);
     }
     else {
+        // Node to be deleted found.
         if (!root->left || !root->right) {
             AVLNode* temp = root->left ? root->left : root->right;
             if (!temp) {
+                // No child case.
                 temp = root;
                 root = NULL;
             }
             else {
+                // One child case: copy the contents.
                 *root = *temp;
             }
             free(temp);
         }
         else {
+            // Node with two children: Get the inorder successor.
             AVLNode* temp = minValueNode(root->right);
-            strncpy(root->data, temp->data, AVL_MAX_LEN - 1);
-            root->data[AVL_MAX_LEN - 1] = '\0';
-            root->right = avl_remove_node(root->right, temp->data);
+            root->data = temp->data;
+            // Convert temp->data back to string for removal.
+            char buffer[32];
+            sprintf(buffer, "%d", temp->data);
+            root->right = avl_remove_node(root->right, buffer);
         }
     }
+
     if (!root) return root;
+
     root->height = 1 + maxInt(height(root->left), height(root->right));
     int balance = getBalance(root);
+
+    // Left Left Case
     if (balance > 1 && getBalance(root->left) >= 0)
         return rightRotate(root);
+    // Left Right Case
     if (balance > 1 && getBalance(root->left) < 0) {
         root->left = leftRotate(root->left);
         return rightRotate(root);
     }
+    // Right Right Case
     if (balance < -1 && getBalance(root->right) <= 0)
         return leftRotate(root);
+    // Right Left Case
     if (balance < -1 && getBalance(root->right) > 0) {
         root->right = rightRotate(root->right);
         return leftRotate(root);
@@ -193,9 +209,11 @@ static char* avl_node_to_json(AVLNode* node, int* next_id) {
     int my_id = (*next_id)++;
     char* left_json = avl_node_to_json(node->left, next_id);
     char* right_json = avl_node_to_json(node->right, next_id);
-    int needed = snprintf(NULL, 0, "{\"id\":%d,\"value\":\"%s\",\"left\":%s,\"right\":%s}", my_id, node->data, left_json, right_json);
+    int needed = snprintf(NULL, 0, "{\"id\":%d,\"value\":%d,\"left\":%s,\"right\":%s}",
+        my_id, node->data, left_json, right_json);
     char* out = (char*)malloc(needed + 1);
-    sprintf(out, "{\"id\":%d,\"value\":\"%s\",\"left\":%s,\"right\":%s}", my_id, node->data, left_json, right_json);
+    sprintf(out, "{\"id\":%d,\"value\":%d,\"left\":%s,\"right\":%s}",
+        my_id, node->data, left_json, right_json);
     free(left_json);
     free(right_json);
     return out;

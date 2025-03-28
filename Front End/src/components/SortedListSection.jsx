@@ -46,11 +46,14 @@ function SortedListSection() {
   }
 
   async function handleInsert() {
-    const value = inputValue.trim();
-    if (!value) {
-      setErrorMessage("Please enter a valid value to insert.");
+    let value = inputValue.trim();
+    // Validate that the input is a valid integer (only digits)
+    if (!/^\d+$/.test(value)) {
+      setErrorMessage("Please enter a valid integer.");
       return;
     }
+    // Remove leading zeros by converting to a number and back to a string.
+    value = parseInt(value, 10).toString();
     if (value.length > 16) {
       setErrorMessage("Value must be 16 characters or less.");
       return;
@@ -69,11 +72,14 @@ function SortedListSection() {
   }
 
   async function handleRemove() {
-    const value = inputValue.trim();
-    if (!value) {
-      setErrorMessage("Please enter a valid value to remove.");
+    let value = inputValue.trim();
+    // Validate that the input is a valid integer (only digits)
+    if (!/^\d+$/.test(value)) {
+      setErrorMessage("Please enter a valid integer.");
       return;
     }
+    // Remove leading zeros by converting to a number and back to a string.
+    value = parseInt(value, 10).toString();
     setErrorMessage("");
     try {
       const data = await sortedListRemove(value);

@@ -5,7 +5,7 @@
 
 /* A node in the sorted linked list */
 typedef struct SortedListNode {
-    char data[SL_MAX_DATA_LEN];
+    int data;
     struct SortedListNode* next;
 } SortedListNode;
 
