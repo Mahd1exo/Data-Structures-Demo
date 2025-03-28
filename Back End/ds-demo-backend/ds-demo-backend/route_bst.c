@@ -45,6 +45,7 @@ static int handle_bst_clear(struct mg_connection* conn, void* cbdata) {
     return handle_bst_get(conn, NULL);
 }
 
+
 void register_bst_endpoints(struct mg_context* ctx) {
     mg_set_request_handler(ctx, "/api/bst", handle_bst_get, NULL);
     mg_set_request_handler(ctx, "/api/bst/insert", handle_bst_insert, NULL);

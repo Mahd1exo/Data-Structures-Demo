@@ -40,6 +40,13 @@ void stk_clear(Stack* stack) {
         stk_pop(stack);
     }
 }
+//void stk_clear_null(Stack* stack) {
+//	if (!stack) return;
+//	while (stack->top) {
+//		stk_pop(stack);
+//	}
+//	stack->top = NULL;
+//}
 
 char** stk_collect_data(const Stack* stack, int* count) {
     if (!stack) {

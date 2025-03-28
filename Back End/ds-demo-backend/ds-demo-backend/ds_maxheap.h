@@ -18,6 +18,9 @@ extern "C" {
     int maxheap_extractTop(MaxHeap* heap);  // Extracts and returns the maximum element.
     char* maxheap_to_json(MaxHeap* heap);
     void maxheap_clear(MaxHeap* heap);
+	void maxheap_clear_null(MaxHeap* heap);
+
+
 
 #ifdef __cplusplus
 }

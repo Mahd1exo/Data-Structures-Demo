@@ -39,7 +39,21 @@ void register_endpoints(struct mg_context* ctx) {
     register_bst_endpoints(ctx);
     register_avl_endpoints(ctx);
     register_minheap_endpoints(ctx);
-    register_sortedlist_endpoints(ctx); // Sorted list endpoints
+    register_sortedlist_endpoints(ctx); 
     register_circularlist_endpoints(ctx);
 
+}
+
+void clear_all_data_structures(void) {
+    ll_clear(&g_list);
+    stk_clear(&g_stack);
+    que_clear(&g_queue);
+    tree_clear(&g_tree);
+    maxheap_clear_null(&g_heap);
+    hash_clear(&g_hash);
+    bst_clear(&g_bst);
+    avl_clear(&g_avl);
+    minheap_clear_null(&g_minheap);
+    sl_clear(&g_sortedlist);
+    cl_clear(&g_circularlist);
 }

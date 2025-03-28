@@ -18,6 +18,8 @@ extern "C" {
     int minheap_extractMin(MinHeap* heap);
     char* minheap_to_json(MinHeap* heap);
     void minheap_clear(MinHeap* heap);
+	void minheap_clear_null(MinHeap* heap);
+
 
 #ifdef __cplusplus
 }
