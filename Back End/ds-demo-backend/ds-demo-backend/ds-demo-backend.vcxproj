@@ -159,6 +159,7 @@
     <ClCompile Include="stack_ops.c" />
     <ClCompile Include="task_queue.c" />
     <ClCompile Include="task_stack.c" />
+    <ClCompile Include="thread_pool.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cleanup.h" />
@@ -181,6 +182,11 @@
     <ClInclude Include="stack_ops.h" />
     <ClInclude Include="task_queue.h" />
     <ClInclude Include="task_stack.h" />
+    <ClInclude Include="thread_pool.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Cleanup.c.txt" />
+    <Text Include="main.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

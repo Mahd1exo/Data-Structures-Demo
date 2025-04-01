@@ -16,15 +16,15 @@
 
 typedef void (*task_func_t)(void* context);
 
-typedef struct Task {
+typedef struct TaskThread {
     task_func_t func;
     void* context;
-    struct Task* next;
-} Task;
+    struct TaskThread* next;
+} TaskThread;
 
 typedef struct {
-    Task* front;
-    Task* rear;
+    TaskThread* front;
+    TaskThread* rear;
 } TaskQueue;
 
 void task_queue_init(TaskQueue* q);
@@ -39,3 +39,4 @@ task_func_t task_queue_dequeue(TaskQueue* q, void** context);
 void task_queue_clear(TaskQueue* q);
 
 #endif /* TASK_QUEUE_H */
+

@@ -92,7 +92,8 @@ int main(int argc, char* argv[]) {
             // Add a command to the stack
             stack_push(&commandStack, "Show Logs");
             // Enqueue a task to show logs
-            task_queue_enqueue(&mainQueue, (task_func_t)show_logs, NULL);
+            // For SHOW_LOGS, run directly on the main thread since _kbhit() and _getch() are best used there.
+            task_queue_enqueue(&mainQueue, (task_func_t)show_logs, NULL);  // Call synchronously
             break;
 
         case SHOW_HISTORY:
@@ -128,3 +129,12 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+/*
+* why?
+*  1.Resource Management.a
+*  2.Potential for Asynchronous or Multi-threaded Execution.
+*  3.Centralized Error Handling and Monitoring.
+*  4.Dynamic Task Management.
+*  5.Flexibility and Extensibility.
+*  6.Decoupling Task Scheduling from Execution
+*/

@@ -120,6 +120,9 @@
     <ClCompile Include="server_start.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="thread_pool.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="route_handlers.h">
@@ -182,5 +185,16 @@
     <ClInclude Include="server_start.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="thread_pool.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Cleanup.c.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="main.txt">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

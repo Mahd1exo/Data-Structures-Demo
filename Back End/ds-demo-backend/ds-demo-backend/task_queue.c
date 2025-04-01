@@ -9,7 +9,7 @@ int task_queue_is_empty(TaskQueue* q) {
 }
 
 void task_queue_enqueue(TaskQueue* q, task_func_t func, void* context) {
-    Task* newTask = (Task*)malloc(sizeof(Task));
+    TaskThread* newTask = (TaskThread*)malloc(sizeof(TaskThread));
     if (!newTask) {
         fprintf(stderr, "Memory allocation error in task_queue_enqueue\n");
         exit(EXIT_FAILURE);
@@ -31,7 +31,7 @@ task_func_t task_queue_dequeue(TaskQueue* q, void** context) {
     if (task_queue_is_empty(q)) {
         return NULL;
     }
-    Task* temp = q->front;
+    TaskThread* temp = q->front;
     task_func_t func = temp->func;
     if (context) {
         *context = temp->context;
