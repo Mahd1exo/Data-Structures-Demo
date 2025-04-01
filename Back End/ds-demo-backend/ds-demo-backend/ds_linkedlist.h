@@ -28,6 +28,7 @@ extern "C" {
 	void ll_add_by_index(LinkedList* list, const char* value, int index);
 	void ll_remove_by_index(LinkedList* list, int index);
 
+
 #ifdef __cplusplus
 }
 #endif

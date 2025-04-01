@@ -46,12 +46,22 @@ function SortedListSection() {
   }
 
   async function handleInsert() {
-    const value = inputValue.trim();
-    if (!value) {
-      setErrorMessage("Please enter a valid value to insert.");
+    let value = inputValue.trim();
+    // Validate that the input is a valid integer (including negatives)
+    if (!/^-?\d+$/.test(value)) {
+      setErrorMessage("Please enter a valid integer.");
       return;
     }
-    if (value.length > 16) {
+    // Remove leading zeros while preserving the negative sign if present.
+    if (value[0] === "-") {
+      // Remove the '-' sign temporarily for cleanup
+      const num = parseInt(value.substring(1), 10).toString();
+      value = "-" + num;
+    } else {
+      value = parseInt(value, 10).toString();
+    }
+    // Check the length of the digits (ignoring the minus sign)
+    if (value.replace("-", "").length > 16) {
       setErrorMessage("Value must be 16 characters or less.");
       return;
     }
@@ -69,10 +79,18 @@ function SortedListSection() {
   }
 
   async function handleRemove() {
-    const value = inputValue.trim();
-    if (!value) {
-      setErrorMessage("Please enter a valid value to remove.");
+    let value = inputValue.trim();
+    // Validate that the input is a valid integer (including negatives)
+    if (!/^-?\d+$/.test(value)) {
+      setErrorMessage("Please enter a valid integer.");
       return;
+    }
+    // Remove leading zeros while preserving the negative sign if present.
+    if (value[0] === "-") {
+      const num = parseInt(value.substring(1), 10).toString();
+      value = "-" + num;
+    } else {
+      value = parseInt(value, 10).toString();
     }
     setErrorMessage("");
     try {

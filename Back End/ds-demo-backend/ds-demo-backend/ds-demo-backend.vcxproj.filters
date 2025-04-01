@@ -102,6 +102,27 @@
     <ClCompile Include="route_circularlist.c">
       <Filter>Source Files\routes</Filter>
     </ClCompile>
+    <ClCompile Include="task_queue.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="cleanup.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="logging.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stack_ops.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="task_stack.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
+    <ClCompile Include="server_start.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="thread_pool.c">
+      <Filter>Source Files\ds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="route_handlers.h">
@@ -146,5 +167,34 @@
     <ClInclude Include="ds_circularlist.h">
       <Filter>Header Files\ds</Filter>
     </ClInclude>
+    <ClInclude Include="task_queue.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="cleanup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="logging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stack_ops.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="task_stack.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+    <ClInclude Include="server_start.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="thread_pool.h">
+      <Filter>Header Files\ds</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Cleanup.c.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="main.txt">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

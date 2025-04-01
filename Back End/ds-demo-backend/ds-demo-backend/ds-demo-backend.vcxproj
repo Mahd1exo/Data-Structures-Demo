@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cleanup.c" />
     <ClCompile Include="ds_avl.c" />
     <ClCompile Include="ds_bst.c" />
     <ClCompile Include="ds_circularlist.c" />
@@ -138,6 +139,7 @@
     <ClCompile Include="ds_sortedlist.c" />
     <ClCompile Include="ds_stack.c" />
     <ClCompile Include="ds_tree.c" />
+    <ClCompile Include="logging.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="route_avl.c" />
     <ClCompile Include="route_bst.c" />
@@ -153,8 +155,14 @@
     <ClCompile Include="route_stack.c" />
     <ClCompile Include="route_tree.c" />
     <ClCompile Include="route_utils.c" />
+    <ClCompile Include="server_start.c" />
+    <ClCompile Include="stack_ops.c" />
+    <ClCompile Include="task_queue.c" />
+    <ClCompile Include="task_stack.c" />
+    <ClCompile Include="thread_pool.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cleanup.h" />
     <ClInclude Include="ds_avl.h" />
     <ClInclude Include="ds_bst.h" />
     <ClInclude Include="ds_circularlist.h" />
@@ -166,9 +174,19 @@
     <ClInclude Include="ds_sortedlist.h" />
     <ClInclude Include="ds_stack.h" />
     <ClInclude Include="ds_tree.h" />
+    <ClInclude Include="logging.h" />
     <ClInclude Include="route_globals.h" />
     <ClInclude Include="route_handlers.h" />
     <ClInclude Include="route_utils.h" />
+    <ClInclude Include="server_start.h" />
+    <ClInclude Include="stack_ops.h" />
+    <ClInclude Include="task_queue.h" />
+    <ClInclude Include="task_stack.h" />
+    <ClInclude Include="thread_pool.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Cleanup.c.txt" />
+    <Text Include="main.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,7 +2,10 @@
 #define ROUTE_UTILS_H
 
 #include <civetweb.h>
-#include <stddef.h>  /* for size_t */
+#include <stddef.h>  
+#include "thread_pool.h"
+
+
 
 /* read_request_body: read entire request into buf, ensure null-termination */
 int read_request_body(struct mg_connection* conn, char* buf, size_t bufSize);

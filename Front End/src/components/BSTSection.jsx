@@ -24,8 +24,10 @@ function BSTSection() {
   // Helper function: Recursively check if the value already exists in the BST
   function existsInBST(node, value) {
     if (!node) return false;
-    if (node.value === value) return true;
-    return existsInBST(node.left, value) || existsInBST(node.right, value);
+    // Convert the input value to a number for proper comparison
+    const intValue = parseInt(value, 10);
+    if (node.value === intValue) return true;
+    return existsInBST(node.left, intValue) || existsInBST(node.right, intValue);
   }
 
   async function fetchBSTData() {

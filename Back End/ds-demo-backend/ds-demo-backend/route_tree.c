@@ -57,13 +57,13 @@ static int handle_tree_get(struct mg_connection* conn, void* cbdata) {
     send_json(conn, json ? json : "{ \"tree\": null }");
     if (json)
         free(json);
-    return 200;
+    return SUCCESS_RESPONSE_CODE;
 }
 
 static int handle_tree_insert(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
-    char value[64];
+    char value[MAX_VALUE_LEN];
     if (extract_value_from_body(body, value, sizeof(value))) {
         tree_insert(&g_tree, value);
     }
@@ -71,7 +71,7 @@ static int handle_tree_insert(struct mg_connection* conn, void* cbdata) {
 }
 
 static int handle_tree_remove(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
     int id = -1;
     const char* p = strstr(body, "\"id\"");
@@ -90,9 +90,9 @@ static int handle_tree_remove(struct mg_connection* conn, void* cbdata) {
 }
 
 static int handle_tree_insert_child(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
-    char value[64];
+    char value[MAX_VALUE_LEN];
     if (extract_value_from_body(body, value, sizeof(value))) {
         int parentId = -1;
         const char* p = strstr(body, "\"parent\"");
@@ -112,7 +112,7 @@ static int handle_tree_insert_child(struct mg_connection* conn, void* cbdata) {
 }
 
 static int handle_tree_remove_child(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
     int parentId = -1, childId = -1;
     const char* p = strstr(body, "\"parent\"");

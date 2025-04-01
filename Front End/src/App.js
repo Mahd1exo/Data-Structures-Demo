@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "./components/Navbar";
 import Tabs from "./components/Tabs";
 
+// Existing sections
 import LinkedListSection from "./components/LinkedListSection";
 import StackSection from "./components/StackSection";
 import QueueSection from "./components/QueueSection";
@@ -16,6 +17,7 @@ import HashTableSection from "./components/HashTableSection";
 import TreeSection from "./components/TreeSection";
 import BSTSection from "./components/BSTSection";
 import AVLSection from "./components/AVLSection";
+import InformationSection from "./components/InformationSection";
 
 function App() {
   const [activeTab, setActiveTab] = useState("list");
@@ -31,6 +33,7 @@ function App() {
       <Navbar />
 
       <div className="container mx-auto px-4">
+        {/* 2) Ensure your Tabs component includes an "info" tab option */}
         <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         <div className="relative border border-t-0 rounded-b bg-white p-4 shadow">
@@ -165,6 +168,20 @@ function App() {
                 transition={{ duration: 0.3 }}
               >
                 <AVLSection />
+              </motion.div>
+            )}
+
+            {/* 3) New tab: "info" displays InformationSection */}
+            {activeTab === "info" && (
+              <motion.div
+                key="info"
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={{ duration: 0.3 }}
+              >
+                <InformationSection />
               </motion.div>
             )}
           </AnimatePresence>

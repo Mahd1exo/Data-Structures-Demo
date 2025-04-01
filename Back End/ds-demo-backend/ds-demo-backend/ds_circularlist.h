@@ -1,3 +1,12 @@
+/*
+* FILE : ds_circularlist.h
+* PROJECT : FINAL PROJECT - DATA STRUCTURE - Data Structure Demo
+* PROGRAMMER : Mohammad Mehdi Ebrahimzadeh
+* FIRST VERSION : 2024-03-10
+*
+* DESCRIPTION :
+* This file contains the declaration of the CircularList data structure and its functions.
+*/
 #ifndef DS_CIRCULARLIST_H
 #define DS_CIRCULARLIST_H
 

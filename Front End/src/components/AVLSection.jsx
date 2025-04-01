@@ -38,10 +38,12 @@ function AVLSection() {
   }
 
   // Recursively check if the value already exists in the tree.
+  // Convert the input value to an integer to ensure proper comparison.
   function existsInTree(node, value) {
     if (!node) return false;
-    if (node.value === value) return true;
-    return existsInTree(node.left, value) || existsInTree(node.right, value);
+    const intValue = parseInt(value, 10);
+    if (node.value === intValue) return true;
+    return existsInTree(node.left, intValue) || existsInTree(node.right, intValue);
   }
 
   async function handleInsert() {
@@ -87,7 +89,7 @@ function AVLSection() {
       setErrorMessage("Input must be a valid integer.");
       return;
     }
-    // Check if the value exists in the tree
+    // Check if the value exists in the tree (using integer comparison)
     if (!bst || !existsInTree(bst, trimmedValue)) {
       setErrorMessage("Value does not exist in the tree.");
       return;

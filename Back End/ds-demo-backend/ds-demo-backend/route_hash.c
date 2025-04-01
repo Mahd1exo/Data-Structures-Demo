@@ -20,13 +20,13 @@ static int handle_hash_getall(struct mg_connection* conn, void* cbdata) {
     send_json(conn, json ? json : "{ \"hash\": [] }");
     if (json)
         free(json);
-    return 200;
+    return SUCCESS_RESPONSE_CODE;
 }
 
 static int handle_hash_insert(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
-    char key[64], val[64];
+    char key[MAX_KEY_LEN], val[MAX_VALUE_LEN];
     if (extract_key_val(body, key, sizeof(key), val, sizeof(val))) {
         hash_insert(&g_hash, key, val);
     }
@@ -34,29 +34,29 @@ static int handle_hash_insert(struct mg_connection* conn, void* cbdata) {
 }
 
 static int handle_hash_remove(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
-    char key[64];
+    char key[MAX_KEY_LEN];
     if (!extract_key_from_body(body, key, sizeof(key))) {
         send_json(conn, "{ \"error\": \"Missing or invalid 'key'\" }");
-        return 400;
+        return FAILURE_RESPONSE_CODE;
     }
     hash_remove(&g_hash, key);
     return handle_hash_getall(conn, NULL);
 }
 
 static int handle_hash_contains(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
-    char key[64];
+    char key[MAX_KEY_LEN];
     int result = 0;
     if (extract_key_from_body(body, key, sizeof(key))) {
         result = hash_contains(&g_hash, key);
     }
-    char resp[64];
+    char resp[MAX_KEY_LEN];
     snprintf(resp, sizeof(resp), "{ \"contains\": %s }", result ? "true" : "false");
     send_json(conn, resp);
-    return 200;
+    return SUCCESS_RESPONSE_CODE;
 }
 
 static int handle_hash_clear(struct mg_connection* conn, void* cbdata) {

@@ -7,39 +7,37 @@
 
 extern SimpleBST g_bst;
 
+/* GET: /api/bst */
 static int handle_bst_get(struct mg_connection* conn, void* cbdata) {
     char* json = bst_to_json(&g_bst);
-    mg_printf(conn,
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: application/json\r\n"
-        "Access-Control-Allow-Origin: *\r\n"
-        "Content-Length: %d\r\n\r\n%s",
-        (int)strlen(json),
-        json);
-    free(json);
-    return 200;
+    send_json(conn, json ? json : "{ \"bst\": [] }");
+    if (json) free(json);
+    return SUCCESS_RESPONSE_CODE;
 }
 
+/* POST: /api/bst/insert */
 static int handle_bst_insert(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
-    char value[64];
+    char value[MAX_VALUE_LEN];
     if (extract_value_from_body(body, value, sizeof(value))) {
         bst_insert(&g_bst, value);
     }
     return handle_bst_get(conn, NULL);
 }
 
+/* POST: /api/bst/remove */
 static int handle_bst_remove(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
-    char value[64];
+    char value[MAX_VALUE_LEN];
     if (extract_value_from_body(body, value, sizeof(value))) {
         bst_remove(&g_bst, value);
     }
     return handle_bst_get(conn, NULL);
 }
 
+/* DELETE: /api/bst/clear */
 static int handle_bst_clear(struct mg_connection* conn, void* cbdata) {
     bst_clear(&g_bst);
     return handle_bst_get(conn, NULL);

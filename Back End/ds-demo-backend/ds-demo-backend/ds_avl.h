@@ -1,11 +1,18 @@
-
+/*
+* FILE : ds_avl.h
+* PROJECT : FINAL PROJECT - DATA STRUCTURE - Data Structure Demo
+* PROGRAMMER : Mohammad Mehdi Ebrahimzadeh
+* FIRST VERSION : 2024-03-10
+*
+* DESCRIPTION :
+* This file contains the declaration of the AVL tree data structure and its functions.
+*/
 #ifndef DS_AVL_H
 #define DS_AVL_H
 
-#define AVL_MAX_LEN 64
 
 typedef struct AVLNode {
-    char data[AVL_MAX_LEN];
+    int data;
     int height;
     struct AVLNode* left;
     struct AVLNode* right;

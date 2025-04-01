@@ -16,13 +16,13 @@ static int handle_get_linked_list(struct mg_connection* conn, void* cbdata) {
     send_json(conn, json ? json : "{ \"list\": [] }");
     if (json)
         free(json);
-    return 200;
+    return SUCCESS_RESPONSE_CODE;
 }
 
 static int handle_post_list_add_front(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
-    char value[64];
+    char value[MAX_VALUE_LEN];
     if (extract_value_from_body(body, value, sizeof(value))) {
         ll_add_front(&g_list, value);
     }
@@ -30,9 +30,9 @@ static int handle_post_list_add_front(struct mg_connection* conn, void* cbdata) 
 }
 
 static int handle_post_list_add_end(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
-    char value[64];
+    char value[MAX_VALUE_LEN];
     if (extract_value_from_body(body, value, sizeof(value))) {
         ll_add_end(&g_list, value);
     }
@@ -40,13 +40,13 @@ static int handle_post_list_add_end(struct mg_connection* conn, void* cbdata) {
 }
 
 static int handle_post_list_add_by_index(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
-    char value[64];
+    char value[MAX_VALUE_LEN];
     int index = extract_index_from_body(body);
     if (index < 0) {
         send_json(conn, "{ \"error\": \"Missing or invalid 'index'\" }");
-        return 400;
+        return FAILURE_RESPONSE_CODE;
     }
     if (extract_value_from_body(body, value, sizeof(value))) {
         ll_add_by_index(&g_list, value, index);
@@ -55,12 +55,12 @@ static int handle_post_list_add_by_index(struct mg_connection* conn, void* cbdat
 }
 
 static int handle_delete_list_remove_by_index(struct mg_connection* conn, void* cbdata) {
-    char body[1024];
+    char body[MAX_BODY_LEN];
     read_request_body(conn, body, sizeof(body));
     int index = extract_index_from_body(body);
     if (index < 0) {
         send_json(conn, "{ \"error\": \"Missing or invalid 'index'\" }");
-        return 400;
+        return FAILURE_RESPONSE_CODE;
     }
     ll_remove_by_index(&g_list, index);
     return handle_get_linked_list(conn, NULL);

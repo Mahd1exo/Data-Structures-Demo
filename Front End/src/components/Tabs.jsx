@@ -10,7 +10,8 @@ import {
   FaBalanceScale,     // AVL
   FaSitemap,          // BST
   FaSortAlphaDown,    // Sorted List
-  FaRecycle           // Circular List
+  FaRecycle,          // Circular List
+  FaInfoCircle        // New: Info Tab
 } from "react-icons/fa";
 
 import {
@@ -28,6 +29,7 @@ import {
 } from "../services/api";
 
 function Tabs({ activeTab, onTabChange }) {
+  // A helper to set the CSS classes for each tab button
   const tabClass = (tabName) =>
     `px-4 py-2 rounded-t ${
       activeTab === tabName
@@ -41,6 +43,7 @@ function Tabs({ activeTab, onTabChange }) {
     );
     if (confirmed) {
       try {
+        // Clear all data structures in parallel
         await Promise.all([
           clearLinkedList(),
           clearStack(),
@@ -55,7 +58,8 @@ function Tabs({ activeTab, onTabChange }) {
           sortedListClear()
         ]);
         alert("All data structures have been cleared.");
-        // Force a re-render by temporarily clearing the active tab and then restoring it
+
+        // Force a re-render by briefly changing the active tab
         const currentTab = activeTab;
         onTabChange("");
         setTimeout(() => {
@@ -136,7 +140,16 @@ function Tabs({ activeTab, onTabChange }) {
           <span>AVL</span>
         </div>
       </button>
-      {/* Extra "Clean All" tab */}
+
+      {/* New Info tab */}
+      <button className={tabClass("info")} onClick={() => onTabChange("info")}>
+        <div className="flex items-center gap-1">
+          <FaInfoCircle />
+          <span>Info</span>
+        </div>
+      </button>
+
+      {/* "Clean All" button remains at the end (no "activeTab" style) */}
       <button
         className="px-4 py-2 rounded-t bg-red-500 text-white hover:bg-red-400 font-semibold ml-auto"
         onClick={handleCleanAll}

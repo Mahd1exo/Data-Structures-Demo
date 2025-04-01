@@ -1,0 +1,305 @@
+#define _CRTDBG_MAP_ALLOC
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdlib.h>
+#include <crtdbg.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <conio.h>
+#include <windows.h>
+
+#include <civetweb.h>
+#include "server_start.h"      // For start_server()
+#include "cleanup.h"           // For cleanup_and_check_leaks()
+#include "logging.h"           // For show_logs(), etc.
+#include "task_queue.h"        // For TaskQueue usage
+#include "stack_ops.h"         // For stack usage
+#include "route_handlers.h"    // For register_endpoints
+#include "thread_pool.h"       // For ThreadPool usage
+
+// Enum for menu options
+enum MenuOption {
+    EXIT = 1,
+    SHOW_LOGS,
+    SHOW_HISTORY,
+    CLEAN_MEMORY = 1234
+};
+
+// Display a small menu
+static void show_menu(void) {
+    printf("\n======== DEBUGGING MENU ========\n");
+    printf("1. Exit server and check for memory leaks\n");
+    printf("2. Show logs (view in-memory log buffer)\n");
+    printf("3. Show operation history\n");
+    printf("1234. Clean Memory (for testing; clears data structures)\n");
+    printf("!!! CLEAN MEMORY IS FOR TESTING MEMORY LEAKS, NOT FOR REGULAR OPERATION !!!\n");
+    printf("Enter option: ");
+}
+
+int main(int argc, char* argv[]) {
+    // Initial memory snapshot for leak detection
+    _CrtMemState initialState;
+    _CrtMemCheckpoint(&initialState);
+
+    // Create and initialize a main task queue (not used directly for execution)
+    TaskQueue mainQueue;
+    task_queue_init(&mainQueue);
+
+    // A stack to keep track of commands (optional)
+    Stack commandStack;
+    stack_init(&commandStack);
+
+    // CivetWeb server options
+    const char* options[] = {
+        "listening_ports", "8080",
+        "num_threads", "2",
+        "access_log_file", "access.log",
+        NULL
+    };
+
+    // Start the server (returns both ctx and callbacks)
+    ServerResources resources = start_server(options);
+    if (!resources.ctx) {
+        printf("Error: Could not start server.\n");
+        return 1;
+    }
+    printf("Server started on port 8080.\n");
+
+    // Initialize a thread pool for processing tasks
+    ThreadPool pool;
+    if (thread_pool_init(&pool, 4) != 0) {
+        fprintf(stderr, "Failed to initialize thread pool.\n");
+        return 1;
+    }
+
+    bool exitFlag = false;
+    while (!exitFlag) {
+        show_menu();
+
+        int option;
+        if (scanf("%d", &option) != 1) {
+            // Clear invalid input
+            while (getchar() != '\n');
+            continue;
+        }
+
+        switch (option) {
+        case EXIT:
+            exitFlag = true;
+            break;
+
+        case SHOW_LOGS:
+            // Log command pushed to stack and add task to show logs via the thread pool
+            stack_push(&commandStack, "Show Logs");
+            thread_pool_add_task(&pool, (thread_task_func_t)show_logs, NULL);
+            break;
+
+        case SHOW_HISTORY:
+            stack_push(&commandStack, "Show Operation History");
+            thread_pool_add_task(&pool, (thread_task_func_t)print_stack, &commandStack);
+            break;
+
+        case CLEAN_MEMORY:
+            stack_push(&commandStack, "Starting Cleaning Memory...");
+            thread_pool_add_task(&pool, (thread_task_func_t)clear_all_data_structures, NULL);
+            thread_pool_add_task(&pool, (thread_task_func_t)printf, "Memory cleaned.\n");
+            thread_pool_add_task(&pool, (thread_task_func_t)printf, "NOTE: After cleaning memory, you must reinitialize data structures.\n");
+            stack_push(&commandStack, "Cleaned Memory");
+            break;
+
+        default:
+            stack_push(&commandStack, "Invalid Option");
+            thread_pool_add_task(&pool, (thread_task_func_t)printf, "Invalid option. Please try again.\n");
+            break;
+        }
+
+        // The tasks are added to the thread pool and will execute asynchronously.
+    }
+
+    // Clean up the main queue and stack
+    task_queue_clear(&mainQueue);
+    stack_free(&commandStack);
+
+    // Wait for any pending tasks and destroy the thread pool
+    thread_pool_destroy(&pool);
+
+    // Final cleanup: stop the server, free callbacks, check for memory leaks
+    cleanup_and_check_leaks(resources, &initialState);
+
+    return 0;
+}
+
+/*
+ * Why use a Thread Pool in this project?
+ *  1. Resource Management:
+ *     - Reuses a fixed set of threads to execute tasks, reducing overhead.
+ *  2. Potential for Asynchronous or Multi-threaded Execution:
+ *     - Allows tasks (like log processing, memory cleaning) to run in parallel without blocking the main thread.
+ *  3. Centralized Error Handling and Monitoring:
+ *     - Tasks managed in a thread pool can be tracked and monitored for failures.
+ *  4. Dynamic Task Management:
+ *     - Tasks are added to a queue and processed by available threads, balancing load.
+ *  5. Flexibility and Extensibility:
+ *     - Easily adjust the number of threads based on system resources or workload.
+ *  6. Decoupling Task Scheduling from Execution:
+ *     - The main program can continue running while tasks are processed in the background.
+ */
+
+
+ #define _CRTDBG_MAP_ALLOC
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdlib.h>
+#include <crtdbg.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <conio.h>
+#include <windows.h>
+
+#include <civetweb.h>
+#include "server_start.h"      // For start_server()
+#include "cleanup.h"           // For cleanup_and_check_leaks()
+#include "logging.h"           // For show_logs(), etc.
+#include "task_queue.h"        // For TaskQueue usage
+#include "stack_ops.h"         // For stack usage
+#include "route_handlers.h"    // For register_endpoints
+#include "thread_pool.h"       // For ThreadPool usage
+
+// Enum for menu options
+enum MenuOption {
+    EXIT = 1,
+    SHOW_LOGS,
+    SHOW_HISTORY,
+    CLEAN_MEMORY = 1234
+};
+
+// Helper: Process tasks from a TaskQueue and enqueue them into the thread pool
+static void process_tasks_with_thread_pool(TaskQueue* queue, ThreadPool* pool) {
+    void* taskContext = NULL;
+    task_func_t task;
+    // Dequeue tasks from the TaskQueue and add them to the thread pool
+    while ((task = task_queue_dequeue(queue, &taskContext)) != NULL) {
+        thread_pool_add_task(pool, task, taskContext);
+    }
+}
+
+// Display a small menu
+static void show_menu(void) {
+    printf("\n======== DEBUGGING MENU ========\n");
+    printf("1. Exit server and check for memory leaks\n");
+    printf("2. Show logs (view in-memory log buffer)\n");
+    printf("3. Show operation history\n");
+    printf("1234. Clean Memory (for testing; clears data structures)\n");
+    printf("!!! CLEAN MEMORY IS FOR TESTING MEMORY LEAKS, NOT FOR REGULAR OPERATION !!!\n");
+    printf("Enter option: ");
+}
+
+int main(int argc, char* argv[]) {
+    // Initial memory snapshot for leak detection
+    _CrtMemState initialState;
+    _CrtMemCheckpoint(&initialState);
+
+    // Create and initialize a main task queue (used to collect tasks)
+    TaskQueue mainQueue;
+    task_queue_init(&mainQueue);
+
+    // Create a stack to keep track of commands (optional)
+    Stack commandStack;
+    stack_init(&commandStack);
+
+    // CivetWeb server options
+    const char* options[] = {
+        "listening_ports", "8080",
+        "num_threads", "2",
+        "access_log_file", "access.log",
+        NULL
+    };
+
+    // Start the server (returns both ctx and callbacks)
+    ServerResources resources = start_server(options);
+    if (!resources.ctx) {
+        printf("Error: Could not start server.\n");
+        return 1;
+    }
+    printf("Server started on port 8080.\n");
+
+    // Initialize a thread pool for processing tasks asynchronously
+    ThreadPool pool;
+    if (thread_pool_init(&pool, 4) != 0) {
+        fprintf(stderr, "Failed to initialize thread pool.\n");
+        return 1;
+    }
+
+    bool exitFlag = false;
+    while (!exitFlag) {
+        show_menu();
+
+        int option;
+        if (scanf("%d", &option) != 1) {
+            // Clear invalid input
+            while (getchar() != '\n');
+            continue;
+        }
+
+        switch (option) {
+        case EXIT:
+            exitFlag = true;
+            break;
+
+        case SHOW_LOGS:
+            // Push the command to the stack and enqueue a task to show logs.
+            stack_push(&commandStack, "Show Logs");
+            task_queue_enqueue(&mainQueue, (task_func_t)show_logs, NULL);
+            break;
+
+        case SHOW_HISTORY:
+            stack_push(&commandStack, "Show Operation History");
+            // Enqueue a task to print the command stack.
+            task_queue_enqueue(&mainQueue, (task_func_t)print_stack, &commandStack);
+            break;
+
+        case CLEAN_MEMORY:
+            stack_push(&commandStack, "Starting Cleaning Memory...");
+            // Enqueue memory cleaning tasks.
+            task_queue_enqueue(&mainQueue, (task_func_t)clear_all_data_structures, NULL);
+            task_queue_enqueue(&mainQueue, (task_func_t)printf, "Memory cleaned.\n");
+            task_queue_enqueue(&mainQueue, (task_func_t)printf, "NOTE: After cleaning memory, you must reinitialize data structures.\n");
+            stack_push(&commandStack, "Cleaned Memory");
+            break;
+
+        default:
+            stack_push(&commandStack, "Invalid Option");
+            task_queue_enqueue(&mainQueue, (task_func_t)printf, "Invalid option. Please try again.\n");
+            break;
+        }
+
+        // Process any enqueued tasks from the TaskQueue using the Thread Pool.
+        process_tasks_with_thread_pool(&mainQueue, &pool);
+    }
+
+    // Clean up the main TaskQueue and command stack.
+    task_queue_clear(&mainQueue);
+    stack_free(&commandStack);
+
+    // Wait for any pending tasks and destroy the thread pool.
+    thread_pool_destroy(&pool);
+
+    // Final cleanup: stop the server, free callbacks, check for memory leaks.
+    cleanup_and_check_leaks(resources, &initialState);
+
+    return 0;
+}
+
+/*
+* Why use a Task Queue combined with a Thread Pool in this project?
+*  1. Resource Management:
+*     - The Task Queue collects tasks from various parts of the code, and the Thread Pool reuses a fixed set of threads to process them.
+*  2. Asynchronous or Multi-threaded Execution:
+*     - Tasks are enqueued and then executed concurrently by worker threads, allowing non-blocking operations.
+*  3. Centralized Error Handling and Monitoring:
+*     - All tasks flow through a single Task Queue, making it easier to track and log errors.
+*  4. Dynamic Task Management:
+*     - New tasks can be enqueued at any time, and the Thread Pool processes them as threads become available.
+*  5. Flexibility and Extensibility:
+*     - The combination allows you to easily adjust the number of worker threads or change scheduling strategies.
+*  6. Decoupling Task Scheduling from Execution:
+*     - The main program can continue accepting commands while the Thread Pool processes tasks in the background.
+*/

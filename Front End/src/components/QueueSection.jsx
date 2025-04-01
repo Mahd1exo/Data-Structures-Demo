@@ -86,11 +86,14 @@ function QueueSection() {
     setShowInfoModal((prev) => !prev);
   }
 
+  // Reverse items to display: Left end will be the last node, Right end the first node
+  const reversedItems = items.slice().reverse();
+
   return (
     <div className="w-full p-6">
       {/* Header: Left-Aligned Title, Right-Aligned Info Button */}
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-3xl font-bold text-gray-800 text-left">Queue (Left → Right)</h2>
+        <h2 className="text-3xl font-bold text-gray-800 text-left">Queue (Right → Left)</h2>
         <button
           onClick={toggleInfoModal}
           className="flex items-center gap-1 text-gray-600 hover:text-gray-800 transition-colors duration-300"
@@ -98,7 +101,7 @@ function QueueSection() {
           <FaInfoCircle className="text-2xl" />
         </button>
       </div>
-
+  
       {/* Global Error Message */}
       {errorMessage && (
         <div className="mb-4 p-2 border border-red-300 rounded text-red-600 text-sm">
@@ -192,9 +195,9 @@ function QueueSection() {
       {/* Queue Display */}
       <div className="flex flex-wrap items-center justify-center mt-2">
         <AnimatePresence>
-          {items.map((item, i) => {
+          {reversedItems.map((item, i) => {
             const isLeftmost = i === 0;
-            const isRightmost = i === items.length - 1;
+            const isRightmost = i === reversedItems.length - 1;
             return (
               <React.Fragment key={item.id}>
                 <motion.div
@@ -213,7 +216,7 @@ function QueueSection() {
                   <div className="bg-blue-600 text-white px-4 py-2 rounded shadow text-center text-lg font-bold">
                     {item.value}
                   </div>
-                  {isRightmost && items.length > 1 && (
+                  {isRightmost && reversedItems.length > 1 && (
                     <div className="text-sm text-gray-700">Right</div>
                   )}
                 </motion.div>
