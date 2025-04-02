@@ -99,7 +99,7 @@ static AVLNode* avl_insert_node(AVLNode* node, const char* value) {
         node->right = avl_insert_node(node->right, value);
     }
     else {
-        // Duplicate value; do nothing.
+        // Duplicate valu just return
         return node;
     }
 

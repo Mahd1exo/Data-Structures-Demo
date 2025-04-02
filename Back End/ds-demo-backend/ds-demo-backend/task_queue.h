@@ -37,6 +37,7 @@ task_func_t task_queue_dequeue(TaskQueue* q, void** context);
 
 
 void task_queue_clear(TaskQueue* q);
+void process_task_queue(TaskQueue* queue);
 
 #endif /* TASK_QUEUE_H */
 

@@ -294,7 +294,7 @@ function StackSection() {
           Pop
         </button>
         <button
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center gap-1 font-semibold transition-colors duration-300"
+          className="bg-gray-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-gray-600 transition-colors duration-300"
           onClick={handleClear}
         >
           <FaTrash className="rotate-180" />

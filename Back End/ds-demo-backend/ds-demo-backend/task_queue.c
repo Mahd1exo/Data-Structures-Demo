@@ -50,3 +50,10 @@ void task_queue_clear(TaskQueue* q) {
         task_queue_dequeue(q, &dummy);
     }
 }
+void process_task_queue(TaskQueue* queue) {
+    void* taskContext = NULL;
+    task_func_t task;
+    while ((task = task_queue_dequeue(queue, &taskContext)) != NULL) {
+        task(taskContext);
+    }
+}

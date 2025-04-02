@@ -17,24 +17,17 @@
 
 // Enum for menu options
 enum MenuOption {
-    EXIT = 1,
+    CLEAN_CONSOLE= 0,
+    EXIT,
     SHOW_LOGS,
     SHOW_HISTORY,
     CLEAN_MEMORY = 1234
 };
 
-// Helper: Process tasks in a task queue
-static void process_task_queue(TaskQueue* queue) {
-    void* taskContext = NULL;
-    task_func_t task;
-    while ((task = task_queue_dequeue(queue, &taskContext)) != NULL) {
-        task(taskContext);
-    }
-}
-
 // Display a small menu
 static void show_menu(void) {
-    printf("\n======== DEBUGGING MENU ========\n");
+    printf("\n<<<======== ADMIN MENU ========>>>\n");
+    printf("0. Clean Console\n");
     printf("1. Exit server and check for memory leaks\n");
     printf("2. Show logs (view in-memory log buffer)\n");
     printf("3. Show operation history\n");
@@ -84,6 +77,9 @@ int main(int argc, char* argv[]) {
         }
 
         switch (option) {
+        case CLEAN_CONSOLE:
+            system("cls");
+            break;
         case EXIT:
             exitFlag = true;
             break;
@@ -124,6 +120,9 @@ int main(int argc, char* argv[]) {
     task_queue_clear(&mainQueue);
     stack_free(&commandStack);
 
+    // Test memory dig
+    //int* leak = malloc(100);
+    
     // Final cleanup: stop the server, free callbacks, check for leaks
     cleanup_and_check_leaks(resources, &initialState);
 
@@ -138,3 +137,11 @@ int main(int argc, char* argv[]) {
 *  5.Flexibility and Extensibility.
 *  6.Decoupling Task Scheduling from Execution
 */
+//When to Use Which Approach 
+//    ??Use the Task Queue if 
+//    ??You need to manage tasks more flexibly(e.g. reordering, cancellation, or grouping).
+//    ??You want to decouple task creation from execution.
+//    ??There is a need to handle failure cases(e.g. if the thread pool cannot be initialized you can process tasks synchronously).
+//    ??Use Direct Thread Task if 
+//    ??The task flow is straightforward and does not require intermediate management.
+//    ??You want to minimize overhead and complexity.
