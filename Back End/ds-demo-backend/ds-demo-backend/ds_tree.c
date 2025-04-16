@@ -1,10 +1,24 @@
+/*
+* FILE : ds_tree.c
+* PROJECT : SENG1050 - Data Structures
+* PROGRAMMER : Mohammad Mehdi Ebrahimzadeh
+* FIRST VERSION : 2025-03-15
+* DESCRIPTION :
+* This file contains the implementation of a simple tree data structure.
+*/
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "ds_tree.h"
 
-/* Helper: Safely copy src into dest */
+// FUNCTION     : safeCopy
+// DESCRIPTION  :
+// Safely copies a string to a destination buffer, ensuring null termination.
+// PARAMETERS   : dest - destination buffer
+//              src - source string
+//              maxLen - maximum length of the destination buffer
+// RETURNS      : none
 static void safeCopy(char* dest, const char* src, int maxLen) {
     if (!src) {
         dest[0] = '\0';
@@ -14,7 +28,11 @@ static void safeCopy(char* dest, const char* src, int maxLen) {
     dest[maxLen - 1] = '\0';
 }
 
-/* Free a subtree recursively */
+// FUNCTION     : free_subtree
+// DESCRIPTION  :
+// Frees the memory allocated for a subtree rooted at the given node.
+// PARAMETERS   : node - pointer to the root of the subtree
+// RETURNS      : none
 static void free_subtree(TreeNode* node) {
     if (!node) return;
     for (int i = 0; i < node->childrenCount; i++) {
@@ -24,14 +42,23 @@ static void free_subtree(TreeNode* node) {
     free(node);
 }
 
-/* Initialize the tree */
+// FUNCTION     : tree_init
+// DESCRIPTION  :
+// Initializes the tree.
+// PARAMETERS   : tree - pointer to the SimpleTree structure
+// RETURNS      : none
 void tree_init(SimpleTree* tree) {
     if (!tree) return;
     tree->root = NULL;
-    tree->nextId = 0;  /* IDs start at 0 */
+    tree->nextId = 0; 
 }
 
-/* Create a new node with a unique id */
+// FUNCTION     : create_node
+// DESCRIPTION  :
+// Creates a new tree node with the given value.
+// PARAMETERS   : tree - pointer to the SimpleTree structure
+//              value - the value to store in the node (as a string)
+// RETURNS      : pointer to the new node (NULL if allocation fails)
 static TreeNode* create_node(SimpleTree* tree, const char* value) {
     TreeNode* node = (TreeNode*)malloc(sizeof(TreeNode));
     if (!node) return NULL;
@@ -43,8 +70,12 @@ static TreeNode* create_node(SimpleTree* tree, const char* value) {
     return node;
 }
 
-/* Default insertion: if tree is empty, new node becomes root;
-   otherwise, insert as a child of the root */
+// FUNCTION     : tree_insert
+// DESCRIPTION  :
+// Inserts a new node with the given value at the root of the tree.
+// PARAMETERS   : tree - pointer to the SimpleTree structure
+//              value - the value to insert (as a string)
+// RETURNS      : none
 void tree_insert(SimpleTree* tree, const char* value) {
     if (!tree) return;
     if (!tree->root) {
@@ -60,7 +91,12 @@ void tree_insert(SimpleTree* tree, const char* value) {
     }
 }
 
-/* Recursive helper to find a node by id */
+// FUNCTION     : find_node_by_id
+// DESCRIPTION  :
+// Finds a node with the given id in the tree using DFS.
+// PARAMETERS   : node - pointer to the current node
+//              targetId - the id to search for
+// RETURNS      : pointer to the found node (NULL if not found)
 static TreeNode* find_node_by_id(TreeNode* node, int targetId) {
     if (!node) return NULL;
     if (node->id == targetId) return node;
@@ -71,7 +107,13 @@ static TreeNode* find_node_by_id(TreeNode* node, int targetId) {
     return NULL;
 }
 
-/* Insert a node as a child of the node with given parentId */
+// FUNCTION     : tree_insert_child
+// DESCRIPTION  :
+// Inserts a new child node with the given value under the specified parent node.
+// PARAMETERS   : tree - pointer to the SimpleTree structure
+//              parentId - the id of the parent node
+//              value - the value to insert (as a string)
+// RETURNS      : none
 void tree_insert_child(SimpleTree* tree, int parentId, const char* value) {
     if (!tree) return;
     if (!tree->root) {
@@ -88,7 +130,13 @@ void tree_insert_child(SimpleTree* tree, int parentId, const char* value) {
     parent->childrenCount = newCount;
 }
 
-/* Remove a node by id using BFS; if the root matches, clear the tree */
+
+// FUNCTION     : tree_remove_by_id
+// DESCRIPTION  :
+// Removes a node with the given id from the tree.
+// PARAMETERS   : tree - pointer to the SimpleTree structure
+//              id - the id of the node to remove
+// RETURNS      : none
 void tree_remove_by_id(SimpleTree* tree, int id) {
     if (!tree || !tree->root) return;
     if (tree->root->id == id) {
@@ -131,7 +179,13 @@ void tree_remove_by_id(SimpleTree* tree, int id) {
     free(queue);
 }
 
-/* Remove a child node under a specific parent by child id */
+// FUNCTION     : tree_remove_child_by_id
+// DESCRIPTION  :
+// Removes a child node with the given id from the specified parent node.
+// PARAMETERS   : tree - pointer to the SimpleTree structure
+//              parentId - the id of the parent node
+//              childId - the id of the child node to remove
+// RETURNS      : none
 void tree_remove_child_by_id(SimpleTree* tree, int parentId, int childId) {
     if (!tree || !tree->root) return;
     TreeNode* parent = find_node_by_id(tree->root, parentId);
@@ -155,7 +209,11 @@ void tree_remove_child_by_id(SimpleTree* tree, int parentId, int childId) {
     }
 }
 
-/* Clear the entire tree */
+// FUNCTION     : tree_clear
+// DESCRIPTION  :
+// Clears the tree, freeing all nodes.
+// PARAMETERS   : tree - pointer to the SimpleTree structure
+// RETURNS      : none
 void tree_clear(SimpleTree* tree) {
     if (!tree) return;
     free_subtree(tree->root);

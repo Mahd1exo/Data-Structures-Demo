@@ -1,29 +1,45 @@
+/*
+* FILE : ds_sortedlist.c
+* PROJECT : SENG1050 - Data Structures
+* PROGRAMMER : Mohammad Mehdi Ebrahimzadeh
+* FIRST VERSION : 2025-03-15
+* DESCRIPTION :
+* This file contains the implementation of a Sorted List data structure.
+*/
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "ds_sortedlist.h"
 
-/* Initialize an empty sorted list. */
-void sl_init(SortedList* list) {
+// FUNCTION     : sortedlist_init
+// DESCRIPTION  :
+// Initializes the sorted list.
+// PARAMETERS   : list - pointer to the SortedList structure
+// RETURNS      : none
+void sortedlist_init(SortedList* list) {
     if (!list) return;
     list->head = NULL;
 }
 
-
-void sl_insert(SortedList* list, const char* value) {
+// FUNCTION     : sortedlist_insert
+// DESCRIPTION  :
+// Inserts a new node with the given value into the sorted list.
+// PARAMETERS   : list - pointer to the SortedList structure
+//              value - the value to insert (as a string)
+// RETURNS      : none
+void sortedlist_insert(SortedList* list, const char* value) {
     if (!list || !value) return;
 
     int newVal = atoi(value);
 
     // Check for duplicate based on numeric value.
-    SortedListNode* cur = list->head;
-    while (cur) {
-        if (cur->data == newVal) {
-            // Duplicate found; do not insert.
+    SortedListNode* current = list->head;
+    while (current) {
+        if (current->data == newVal) {
             return;
         }
-        cur = cur->next;
+        current = current->next;
     }
 
     // Create a new node.
@@ -32,31 +48,31 @@ void sl_insert(SortedList* list, const char* value) {
     node->data = newVal;
     node->next = NULL;
 
-    // If list is empty or the new node should be at the front.
     if (!list->head || newVal < list->head->data) {
         node->next = list->head;
         list->head = node;
         return;
     }
 
-    // Otherwise, find the proper insertion point.
-    cur = list->head;
-    while (cur->next && cur->next->data < newVal) {
-        cur = cur->next;
+    current = list->head;
+    while (current->next && current->next->data < newVal) {
+        current = current->next;
     }
-    node->next = cur->next;
-    cur->next = node;
+    node->next = current->next;
+    current->next = node;
 }
 
-/*
- * Remove the first node matching 'value' (using numeric comparison).
- */
-void sl_remove(SortedList* list, const char* value) {
+// FUNCTION     : sortedlist_remove
+// DESCRIPTION  :
+// Removes a node with the given value from the sorted list.
+// PARAMETERS   : list - pointer to the SortedList structure
+//              value - the value to remove (as a string)
+// RETURNS      : none
+void sortedlist_remove(SortedList* list, const char* value) {
     if (!list || !list->head || !value) return;
 
     int remVal = atoi(value);
 
-    // Special case: if the head node is the one to remove.
     if (list->head->data == remVal) {
         SortedListNode* temp = list->head;
         list->head = temp->next;
@@ -64,73 +80,64 @@ void sl_remove(SortedList* list, const char* value) {
         return;
     }
 
-    SortedListNode* cur = list->head;
-    while (cur->next && cur->next->data != remVal) {
-        cur = cur->next;
+    SortedListNode* current = list->head;
+    while (current->next && current->next->data != remVal) {
+        current = current->next;
     }
-    if (cur->next) {
-        SortedListNode* temp = cur->next;
-        cur->next = temp->next;
+    if (current->next) {
+        SortedListNode* temp = current->next;
+        current->next = temp->next;
         free(temp);
     }
 }
 
-/*
- * Collect string representations of the node data in a contiguous array.
- *
- * This function allocates one block of memory that contains both:
- *   - An array of char* pointers (one per node)
- *   - A contiguous block of memory for all the fixed-size string buffers.
- *
- * Each string buffer is of length SL_MAX_DATA_LEN, and the integer value is
- * converted into a string using snprintf.
- *
- * The caller is responsible for freeing the returned pointer (which frees both
- * the array and the string storage).
- */
-char** sl_collect(const SortedList* list, int* count) {
+// FUNCTION     : sortedlist_collect
+// DESCRIPTION  :
+// Collects all data from the sorted list into an array of strings.
+// PARAMETERS   : list - pointer to the SortedList structure
+//              count - pointer to store the number of nodes collected
+// RETURNS      : pointer to an array of strings representing the node values
+char** sortedlist_collect(const SortedList* list, int* count) {
     if (!list) {
         if (count) *count = 0;
         return NULL;
     }
 
-    int c = 0;
+    int counter = 0;
     SortedListNode* temp = list->head;
     while (temp) {
-        c++;
+        counter++;
         temp = temp->next;
     }
 
-    if (count) *count = c;
-    if (c == 0) return NULL;
+    if (count) *count = counter;
+    if (counter == 0) return NULL;
 
-    /* Allocate one contiguous block:
-       - Space for c pointers: sizeof(char*) * c
-       - Space for c string buffers: c * SL_MAX_DATA_LEN * sizeof(char)
-    */
-    size_t total_size = sizeof(char*) * c + sizeof(char) * SL_MAX_DATA_LEN * c;
-    char** arr = (char**)malloc(total_size);
-    if (!arr) {
+    size_t total_size = sizeof(char*) * counter + sizeof(char) * SL_MAX_DATA_LEN * counter;
+    char** collected_values = (char**)malloc(total_size);
+    if (!collected_values) {
         if (count) *count = 0;
         return NULL;
     }
 
-    // The block immediately following the pointer array will hold the strings.
-    char* string_block = (char*)(arr + c);
+    char* string_block = (char*)(collected_values + counter);
 
-    // Fill the array: each pointer gets its own fixed-size string buffer.
     temp = list->head;
-    for (int i = 0; i < c; i++) {
-        arr[i] = string_block + i * SL_MAX_DATA_LEN;
-        snprintf(arr[i], SL_MAX_DATA_LEN, "%d", temp->data);
+    for (int i = 0; i < counter; i++) {
+        collected_values[i] = string_block + i * SL_MAX_DATA_LEN;
+        snprintf(collected_values[i], SL_MAX_DATA_LEN, "%d", temp->data);
         temp = temp->next;
     }
 
-    return arr;
+    return collected_values;
 }
 
-/* Clear the entire list, freeing all nodes. */
-void sl_clear(SortedList* list) {
+// FUNCTION     : sortedlist_clear
+// DESCRIPTION  :
+// Clears the sorted list, freeing all nodes.
+// PARAMETERS   : list - pointer to the SortedList structure
+// RETURNS      : none
+void sortedlist_clear(SortedList* list) {
     if (!list) return;
 
     SortedListNode* temp = list->head;

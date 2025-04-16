@@ -1,3 +1,11 @@
+/*
+* FILE : task_stack.h
+* PROJECT : SENG1050 - Data Structures
+* PROGRAMMER : Mohammad Mehdi Ebrahimzadeh
+* FIRST VERSION : 2025-03-15
+* DESCRIPTION :
+*  This file contains the declaration of a task stack for managing tasks in a multi-threaded environment.
+*/
 #ifndef TASK_STACK_H
 #define TASK_STACK_H
 
@@ -6,14 +14,13 @@
 // Define a generic task function type.
 typedef void (*task_func_t)(void* context);
 
-// Structure for a single task stack node.
+
 typedef struct TaskStackNode {
     task_func_t func;
     void* context;
     struct TaskStackNode* next;
 } TaskStackNode;
 
-// Structure for the task stack.
 typedef struct {
     TaskStackNode* top;
 } TaskStack;

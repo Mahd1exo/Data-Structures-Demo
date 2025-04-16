@@ -27,16 +27,12 @@ typedef struct {
     TaskThread* rear;
 } TaskQueue;
 
-void task_queue_init(TaskQueue* q);
-
-int task_queue_is_empty(TaskQueue* q);
-
-void task_queue_enqueue(TaskQueue* q, task_func_t func, void* context);
-
-task_func_t task_queue_dequeue(TaskQueue* q, void** context);
-
-
-void task_queue_clear(TaskQueue* q);
+void task_queue_init(TaskQueue* queue);
+int task_queue_is_empty(TaskQueue* queue);
+void task_queue_enqueue(TaskQueue* queue, task_func_t func, void* context);
+task_func_t task_queue_dequeue(TaskQueue* queue, void** context);
+void task_queue_clear(TaskQueue* queue);
+void process_task_queue(TaskQueue* queue);
 
 #endif /* TASK_QUEUE_H */
 

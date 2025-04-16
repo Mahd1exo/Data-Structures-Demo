@@ -9,7 +9,7 @@ extern SimpleHashTable g_hash;  // Global declared in route_handlers.c
 
 static int handle_hash_getall(struct mg_connection* conn, void* cbdata) {
     int count = 0;
-    char** items = hash_collect(&g_hash, &count);
+    char** items = hashTable_collect(&g_hash, &count);
     char* json = build_json_array_response("hash", (const char**)items, count);
     if (items) {
         for (int i = 0; i < count; i++) {
@@ -28,7 +28,7 @@ static int handle_hash_insert(struct mg_connection* conn, void* cbdata) {
     read_request_body(conn, body, sizeof(body));
     char key[MAX_KEY_LEN], val[MAX_VALUE_LEN];
     if (extract_key_val(body, key, sizeof(key), val, sizeof(val))) {
-        hash_insert(&g_hash, key, val);
+        hashTable_insert(&g_hash, key, val);
     }
     return handle_hash_getall(conn, NULL);
 }
@@ -41,7 +41,7 @@ static int handle_hash_remove(struct mg_connection* conn, void* cbdata) {
         send_json(conn, "{ \"error\": \"Missing or invalid 'key'\" }");
         return FAILURE_RESPONSE_CODE;
     }
-    hash_remove(&g_hash, key);
+    hashTable_remove(&g_hash, key);
     return handle_hash_getall(conn, NULL);
 }
 
@@ -51,7 +51,7 @@ static int handle_hash_contains(struct mg_connection* conn, void* cbdata) {
     char key[MAX_KEY_LEN];
     int result = 0;
     if (extract_key_from_body(body, key, sizeof(key))) {
-        result = hash_contains(&g_hash, key);
+        result = hashTable_contains(&g_hash, key);
     }
     char resp[MAX_KEY_LEN];
     snprintf(resp, sizeof(resp), "{ \"contains\": %s }", result ? "true" : "false");
@@ -60,7 +60,7 @@ static int handle_hash_contains(struct mg_connection* conn, void* cbdata) {
 }
 
 static int handle_hash_clear(struct mg_connection* conn, void* cbdata) {
-    hash_clear(&g_hash);
+    hashTable_clear(&g_hash);
     return handle_hash_getall(conn, NULL);
 }
 

@@ -9,7 +9,8 @@
 */
 #ifndef DS_AVL_H
 #define DS_AVL_H
-
+ 
+#define MAX_JSON_BUFFER 16
 
 typedef struct AVLNode {
     int data;

@@ -1,9 +1,24 @@
+/*
+* FILE : ds_linkedlist.c
+* PROJECT : SENG1050 - Data Structures
+* PROGRAMMER : Mohammad Mehdi Ebrahimzadeh
+* FIRST VERSION : 2025-03-15
+* DESCRIPTION :
+* This file contains the implementation of AVL tree data structure
+*/
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "ds_linkedlist.h"
 
+// FUNCTION     : safeCopy
+// DESCRIPTION  :
+// Safely copies a string to a destination buffer, ensuring null termination.
+//// PARAMETERS   : dest - destination buffer
+////              src - source string
+////              maxLen - maximum length of the destination buffer
+//// RETURNS      : none
 static void safeCopy(char* dest, const char* src, int maxLen) {
     if (!src) {
         dest[0] = '\0';
@@ -13,12 +28,18 @@ static void safeCopy(char* dest, const char* src, int maxLen) {
     dest[maxLen - 1] = '\0';
 }
 
-void ll_init(LinkedList* list) {
+void linkedlist_init(LinkedList* list) {
     if (!list) return;
     list->head = NULL;
 }
 
-void ll_add_front(LinkedList* list, const char* value) {
+// FUNCTION     : linkedlist_add_front
+// DESCRIPTION  :
+// Inserts a new node with the given value at the front of the linked list.
+//// PARAMETERS   : list - pointer to the LinkedList structure
+////              value - the value to insert (as a string)
+//// RETURNS      : none
+void linkedlist_add_front(LinkedList* list, const char* value) {
     if (!list) return;
     LLNode* node = (LLNode*)malloc(sizeof(LLNode));
     if (!node) return;
@@ -27,7 +48,13 @@ void ll_add_front(LinkedList* list, const char* value) {
     list->head = node;
 }
 
-void ll_add_end(LinkedList* list, const char* value) {
+// FUNCTION     : linkedlist_add_end
+// DESCRIPTION  :
+// Inserts a new node with the given value at the end of the linked list.
+//// PARAMETERS   : list - pointer to the LinkedList structure
+////              value - the value to insert (as a string)
+//// RETURNS      : none
+void linkedlist_add_end(LinkedList* list, const char* value) {
     if (!list) return;
     LLNode* node = (LLNode*)malloc(sizeof(LLNode));
     if (!node) return;
@@ -43,10 +70,17 @@ void ll_add_end(LinkedList* list, const char* value) {
     }
 }
 
-void ll_add_by_index(LinkedList* list, const char* value, int index) {
+// FUNCTION     : linkedlist_add_by_index
+// DESCRIPTION  :
+// Inserts a new node with the given value at the specified index in the linked list.
+// PARAMETERS   : list - pointer to the LinkedList structure
+//             value - the value to insert (as a string)
+//              index - the index at which to insert the new node
+// RETURNS      : none
+void linkedlist_add_by_index(LinkedList* list, const char* value, int index) {
     if (!list) return;
     if (index <= 0) {
-        ll_add_front(list, value);
+        linkedlist_add_front(list, value);
         return;
     }
     LLNode* node = (LLNode*)malloc(sizeof(LLNode));
@@ -61,7 +95,7 @@ void ll_add_by_index(LinkedList* list, const char* value, int index) {
         currentIndex++;
     }
     if (!current) {
-        ll_add_end(list, value);
+        linkedlist_add_end(list, value);
     }
     else {
         node->next = current->next;
@@ -69,14 +103,26 @@ void ll_add_by_index(LinkedList* list, const char* value, int index) {
     }
 }
 
-void ll_remove_front(LinkedList* list) {
+// FUNCTION     : linkedlist_remove_front
+// DESCRIPTION  :
+//  Removes the first node from the linked list.
+// PARAMETERS   : list - pointer to the LinkedList structure
+//              value - the value to remove (as a string)
+// RETURNS      : none
+void linkedlist_remove_front(LinkedList* list) {
     if (!list || !list->head) return;
     LLNode* temp = list->head;
     list->head = temp->next;
     free(temp);
 }
 
-void ll_remove_end(LinkedList* list) {
+// FUNCTION     : linkedlist_remove_end
+// DESCRIPTION  :
+//  Removes the last node from the linked list.
+//// PARAMETERS   : list - pointer to the LinkedList structure
+////              value - the value to remove (as a string)
+//// RETURNS      : none
+void linkedlist_remove_end(LinkedList* list) {
     if (!list || !list->head) return;
     if (!list->head->next) {
         free(list->head);
@@ -84,64 +130,82 @@ void ll_remove_end(LinkedList* list) {
         return;
     }
     LLNode* prev = list->head;
-    LLNode* curr = list->head->next;
-    while (curr->next) {
-        prev = curr;
-        curr = curr->next;
+    LLNode* current = list->head->next;
+    while (current->next) {
+        prev = current;
+        current = current->next;
     }
     prev->next = NULL;
-    free(curr);
+    free(current);
 }
 
-void ll_remove_by_index(LinkedList* list, int index) {
+// FUNCTION     : linkedlist_remove_by_index
+// DESCRIPTION  :
+//  Removes a node at the specified index from the linked list.
+//// PARAMETERS   : list - pointer to the LinkedList structure
+////              index - the index of the node to remove
+//// // RETURNS      : none
+void linkedlist_remove_by_index(LinkedList* list, int index) {
     if (!list || !list->head) return;
     if (index <= 0) {
-        ll_remove_front(list);
+        linkedlist_remove_front(list);
         return;
     }
     LLNode* prev = list->head;
-    LLNode* curr = list->head->next;
+    LLNode* current = list->head->next;
     int currentIndex = 1;
-    while (curr && currentIndex < index) {
-        prev = curr;
-        curr = curr->next;
+    while (current && currentIndex < index) {
+        prev = current;
+        current = current->next;
         currentIndex++;
     }
-    if (curr) {
-        prev->next = curr->next;
-        free(curr);
+    if (current) {
+        prev->next = current->next;
+        free(current);
     }
 }
 
-void ll_clear(LinkedList* list) {
+// FUNCTION     : linkedlist_remove
+// DESCRIPTION  :
+//  Removes a node with the given value from the linked list.
+// // PARAMETERS   : list - pointer to the LinkedList structure
+////              value - the value to remove (as a string)
+//// RETURNS      : none
+void linkedlist_clear(LinkedList* list) {
     if (!list) return;
     while (list->head) {
-        ll_remove_front(list);
+        linkedlist_remove_front(list);
     }
 }
 
-char** ll_collect_data(const LinkedList* list, int* count) {
+// FUNCTION     : linkedlist_collect_data
+// DESCRIPTION  :
+//  Collects all data from the linked list into an array of strings.
+//// PARAMETERS   : list - pointer to the LinkedList structure
+////              count - pointer to store the number of nodes collected
+//// RETURNS      : pointer to an array of strings representing the node 
+char** linkedlist_collect_data(const LinkedList* list, int* count) {
     if (!list) {
         if (count) *count = 0;
         return NULL;
     }
-    int c = 0;
+    int counter = 0;
     LLNode* temp = list->head;
     while (temp) {
-        c++;
+        counter++;
         temp = temp->next;
     }
-    if (count) *count = c;
-    if (c == 0) {
+    if (count) *count = counter;
+    if (counter == 0) {
         return NULL;
     }
-    char** array = (char**)malloc(sizeof(char*) * c);
+    char** array = (char**)malloc(sizeof(char*) * counter);
     if (!array) {
         if (count) *count = 0;
         return NULL;
     }
     temp = list->head;
-    for (int i = 0; i < c; i++) {
+    for (int i = 0; i < counter; i++) {
         array[i] = temp->data;
         temp = temp->next;
     }

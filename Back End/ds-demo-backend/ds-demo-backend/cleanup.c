@@ -41,10 +41,10 @@ void cleanup_and_check_leaks(ServerResources resources, _CrtMemState* initialSta
     if (thread_pool_init(&cleanupPool, 4) != 0) {
         fprintf(stderr, "Failed to initialize thread pool.\n");
         // If thread pool creation fails, optionally process synchronously:
-        // process_task_queue(&cleanupQueue);
-        // task_queue_clear(&cleanupQueue);
-        // free(callbacks);
-        // return; // or handle error
+        process_task_queue(&cleanupQueue);
+        task_queue_clear(&cleanupQueue);
+        free(callbacks);
+        return; 
     }
     else {
         // 4) Dequeue each task and add it to the thread pool
@@ -63,6 +63,8 @@ void cleanup_and_check_leaks(ServerResources resources, _CrtMemState* initialSta
 
     // 7) Free the mg_callbacks pointer (allocated in start_server)
     free(callbacks);
+    //for checking memory leaks
+    //int* leak = malloc(100);
 
     // 8) Perform the final memory snapshot and leak check
     _CrtMemState finalState, diffState;

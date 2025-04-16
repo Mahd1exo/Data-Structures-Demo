@@ -28,13 +28,13 @@ int my_log_access(const struct mg_connection* conn, const char* message) {
     return 0;
 }
 
-// Show the in-memory log buffer continuously until the user presses 'q'.
+// Show the in-memory log buffer continuously.
 void show_logs(void) {
     while (1) {
-        system("cls");  // Clear screen (Windows-specific)
-        printf("\n========== BEGIN LOGS ==========\n");
+        system("cls"); 
+        printf("\n<<<========== BEGIN LOGS ==========>>>\n");
         printf("%s", log_buffer);
-        printf("\n=========== END LOGS ===========\n");
+        printf("\n>>>---------- END LOGS ----------<<<\n");
         printf("Press 'q' to return to main menu...\n");
 
         if (_kbhit()) {
@@ -43,6 +43,6 @@ void show_logs(void) {
                 break;
             }
         }
-        Sleep(1000);  // Refresh every second
+        Sleep(1000);  
     }
 }

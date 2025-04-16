@@ -1,3 +1,17 @@
+/*
+* FILE : ds_avl.c
+* PROJECT : SENG1050 - Data Structures 
+* PROGRAMMER : Mohammad Mehdi Ebrahimzadeh
+* FIRST VERSION : 2025-03-15
+* DESCRIPTION :
+* This file contains the implementation of AVL tree data structure
+* REFERENCES :
+*  1. https://en.wikipedia.org/wiki/AVL_tree
+*  2. https://www.geeksforgeeks.org/c-program-to-implement-avl-tree/
+*  3. https://www.geeksforgeeks.org/avl-tree-set-1-insertion/
+*  4. https://github.com/xieqing/avl-tree
+*/
+// Header files
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,33 +22,64 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
+// FUNCTION     : avl_init
+// DESCRIPTION  :
+// Initializes the AVL tree.
+// PARAMETERS   : tree - pointer to the AVL tree structure
+// RETURNS      : none
 void avl_init(SimpleAVL* tree) {
     if (!tree) return;
     tree->root = NULL;
 }
 
+// FUNCTION     : avl_insert
+// DESCRIPTION  :
+// Inserts a value into the AVL tree.
+// PARAMETERS   : tree - pointer to the AVL tree structure
+//               value - the value to insert (as a string)
+// RETURNS      : none
 void avl_insert(SimpleAVL* tree, const char* value) {
     if (!tree) return;
     tree->root = avl_insert_node(tree->root, value);
 }
 
+// FUNCTION     : avl_remove
+// DESCRIPTION  :
+// Removes a value from the AVL tree.
+// PARAMETERS   : tree - pointer to the AVL tree structure
+//               value - the value to remove (as a string)
+// RETURNS      : none
 void avl_remove(SimpleAVL* tree, const char* value) {
     if (!tree) return;
     tree->root = avl_remove_node(tree->root, value);
 }
 
+// FUNCTION     : avl_clear
+// DESCRIPTION  :
+// Clears the AVL tree, freeing all nodes.
+// PARAMETERS   : tree - pointer to the AVL tree structure
+// RETURNS      : none
 void avl_clear(SimpleAVL* tree) {
     if (!tree) return;
     avl_clear_nodes(tree->root);
     tree->root = NULL;
 }
 
+// FUNCTION     : avl_to_json
+// DESCRIPTION  :
+// Converts the AVL tree to a JSON string representation.
+// PARAMETERS   : tree - pointer to the AVL tree structure
+// 		   returns a JSON string representing the tree
+// RETURNS      : JSON string (caller is responsible for freeing it)
 char* avl_to_json(SimpleAVL* tree) {
+
+	// Check if the tree is empty
     if (!tree || !tree->root) {
-        char* empty_json = (char*)malloc(16);
+        char* empty_json = (char*)malloc(MAX_JSON_BUFFER);
         strcpy(empty_json, "{\"bst\":null}");
         return empty_json;
     }
+	// Create a JSON representation of the AVL tree
     int next_id = 0;
     char* root_json = avl_node_to_json(tree->root, &next_id);
     int needed = snprintf(NULL, 0, "{\"bst\":%s}", root_json);
@@ -44,19 +89,41 @@ char* avl_to_json(SimpleAVL* tree) {
     return out;
 }
 
+// Helper functions for AVL tree operations
+// FUNCTION     : maxInt
+// DESCRIPTION  :
+// Returns the maximum of two integers.
+// PARAMETERS   : a - first integer
+//			   b - second integer
+// RETURNS      : maximum of a and b
 static int maxInt(int a, int b) {
     return (a > b) ? a : b;
 }
 
+// FUNCTION     : height
+// DESCRIPTION  :
+// Returns the height of a node.
+// PARAMETERS   : node - pointer to the AVL node
+// RETURNS      : height of the node (0 if NULL)
 static int height(AVLNode* node) {
     return node ? node->height : 0;
 }
 
+// FUNCTION     : getBalance
+// DESCRIPTION  :
+// Returns the balance factor of a node.
+// PARAMETERS   : node - pointer to the AVL node
+// RETURNS      : balance factor (height of left subtree - height of right subtree)
 static int getBalance(AVLNode* node) {
     if (!node) return 0;
     return height(node->left) - height(node->right);
 }
 
+// FUNCTION     : create_node
+// DESCRIPTION  :
+// Creates a new AVL node with the given value.
+// PARAMETERS   : value - the value to store in the node (as a string)
+// RETURNS      : pointer to the new node (NULL if allocation fails)
 static AVLNode* create_node(const char* value) {
     AVLNode* node = (AVLNode*)malloc(sizeof(AVLNode));
     if (!node) return NULL;
@@ -67,26 +134,54 @@ static AVLNode* create_node(const char* value) {
     return node;
 }
 
-static AVLNode* rightRotate(AVLNode* y) {
-    AVLNode* x = y->left;
-    AVLNode* T2 = x->right;
-    x->right = y;
-    y->left = T2;
-    y->height = maxInt(height(y->left), height(y->right)) + 1;
-    x->height = maxInt(height(x->left), height(x->right)) + 1;
-    return x;
+// FUNCTION     : rightRotate
+// DESCRIPTION  :
+// Performs a right rotation on the given subtree.
+// PARAMETERS   : root - pointer to the root of the subtree
+// RETURNS      : new root of the subtree after rotation
+static AVLNode* rightRotate(AVLNode* root) {
+	// Perform right rotation
+    AVLNode* leftSubtree = root->left;
+	// Update the left child of the root
+    AVLNode* tempRight = leftSubtree->right;
+
+    // Perform rotation
+    leftSubtree->right = root;
+    root->left = tempRight;
+
+    // Update heights
+    root->height = maxInt(height(root->left), height(root->right)) + 1;
+    leftSubtree->height = maxInt(height(leftSubtree->left), height(leftSubtree->right)) + 1;
+    return leftSubtree;
 }
 
-static AVLNode* leftRotate(AVLNode* x) {
-    AVLNode* y = x->right;
-    AVLNode* T2 = y->left;
-    y->left = x;
-    x->right = T2;
-    x->height = maxInt(height(x->left), height(x->right)) + 1;
-    y->height = maxInt(height(y->left), height(y->right)) + 1;
-    return y;
+// FUNCTION     : leftRotate
+// DESCRIPTION  :
+// Performs a left rotation on the given subtree.
+// PARAMETERS   : root - pointer to the root of the subtree
+// RETURNS      : new root of the subtree after rotation
+static AVLNode* leftRotate(AVLNode* root) {
+	// Perform left rotation
+    AVLNode* rightSubtree = root->right;
+    AVLNode* tempLeft = rightSubtree->left;
+
+    // Perform rotation
+    rightSubtree->left = root;
+    root->right = tempLeft;
+
+    // Update heights
+    root->height = maxInt(height(root->left), height(root->right)) + 1;
+    rightSubtree->height = maxInt(height(rightSubtree->left), height(rightSubtree->right)) + 1;
+    return rightSubtree;
 }
 
+// FUNCTION     : avl_insert_node
+// DESCRIPTION  :
+// Inserts a value into the AVL tree recursively.
+// PARAMETERS   : node - pointer to the current node
+//			      value - the value to insert (as a string)
+// RETURNS      : pointer to the new root of the 
+//			       subtree after insertion
 static AVLNode* avl_insert_node(AVLNode* node, const char* value) {
     if (!node) {
         return create_node(value);
@@ -99,7 +194,6 @@ static AVLNode* avl_insert_node(AVLNode* node, const char* value) {
         node->right = avl_insert_node(node->right, value);
     }
     else {
-        // Duplicate value; do nothing.
         return node;
     }
 
@@ -125,6 +219,11 @@ static AVLNode* avl_insert_node(AVLNode* node, const char* value) {
     return node;
 }
 
+// FUNCTION     : minValueNode
+// DESCRIPTION  :
+// Finds the node with the minimum value in a subtree.
+// PARAMETERS   : node - pointer to the root of the subtree
+// RETURNS      : pointer to the node with the minimum value
 static AVLNode* minValueNode(AVLNode* node) {
     AVLNode* current = node;
     while (current && current->left) {
@@ -133,6 +232,12 @@ static AVLNode* minValueNode(AVLNode* node) {
     return current;
 }
 
+// FUNCTION     : avl_remove_node
+// DESCRIPTION  :
+// Removes a node with the given value from the AVL tree recursively.
+// PARAMETERS   : root - pointer to the current node
+// 		      value - the value to remove (as a string)
+// RETURNS      : pointer to the new root of the subtree after removal
 static AVLNode* avl_remove_node(AVLNode* root, const char* value) {
     if (!root) return root;
 
@@ -153,7 +258,6 @@ static AVLNode* avl_remove_node(AVLNode* root, const char* value) {
                 root = NULL;
             }
             else {
-                // One child case: copy the contents.
                 *root = *temp;
             }
             free(temp);
@@ -162,7 +266,6 @@ static AVLNode* avl_remove_node(AVLNode* root, const char* value) {
             // Node with two children: Get the inorder successor.
             AVLNode* temp = minValueNode(root->right);
             root->data = temp->data;
-            // Convert temp->data back to string for removal.
             char buffer[32];
             sprintf(buffer, "%d", temp->data);
             root->right = avl_remove_node(root->right, buffer);
@@ -199,7 +302,12 @@ static void avl_clear_nodes(AVLNode* node) {
     avl_clear_nodes(node->right);
     free(node);
 }
-
+// FUNCTION     : avl_node_to_json
+// DESCRIPTION  :
+// Converts a single AVL node to a JSON string representation.
+// PARAMETERS   : node - pointer to the AVL node
+//               next_id - pointer to the next ID to use for the node
+// RETURNS      : JSON string representing the node
 static char* avl_node_to_json(AVLNode* node, int* next_id) {
     if (!node) {
         char* null_str = (char*)malloc(5);
