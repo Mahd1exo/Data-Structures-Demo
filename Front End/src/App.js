@@ -184,6 +184,7 @@ function App() {
                 <InformationSection />
               </motion.div>
             )}
+            
           </AnimatePresence>
         </div>
       </div>
