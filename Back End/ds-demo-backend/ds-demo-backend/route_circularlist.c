@@ -10,7 +10,7 @@ extern CircularList g_circularlist;
 /* GET: /api/circular-list */
 static int handle_circularlist_get(struct mg_connection* conn, void* cbdata) {
     int count = 0;
-    char** items = cl_collect_data(&g_circularlist, &count);
+    char** items = circularLinkedList_collect_data(&g_circularlist, &count);
     char* json = build_json_array_response("circularList", (const char**)items, count);
     if (items) free(items);
     send_json(conn, json ? json : "{ \"circularList\": [] }");
@@ -24,7 +24,7 @@ static int handle_circularlist_insert(struct mg_connection* conn, void* cbdata) 
     read_request_body(conn, body, sizeof(body));
     char value[MAX_VALUE_LEN];
     if (extract_value_from_body(body, value, sizeof(value))) {
-        cl_add_end(&g_circularlist, value);
+        circularLinkedList_add_end(&g_circularlist, value);
     }
     return handle_circularlist_get(conn, NULL);
 }
@@ -35,7 +35,7 @@ static int handle_circularlist_insert_front(struct mg_connection* conn, void* cb
     read_request_body(conn, body, sizeof(body));
     char value[MAX_VALUE_LEN];
     if (extract_value_from_body(body, value, sizeof(value))) {
-        cl_add_front(&g_circularlist, value);
+        circularLinkedList_add_front(&g_circularlist, value);
     }
     return handle_circularlist_get(conn, NULL);
 }
@@ -51,7 +51,7 @@ static int handle_circularlist_insert_by_index(struct mg_connection* conn, void*
         return FAILURE_RESPONSE_CODE;
     }
     if (extract_value_from_body(body, value, sizeof(value))) {
-        cl_insert_by_index(&g_circularlist, value, index);
+        circularLinkedList_insert_by_index(&g_circularlist, value, index);
     }
     return handle_circularlist_get(conn, NULL);
 }
@@ -62,20 +62,20 @@ static int handle_circularlist_remove(struct mg_connection* conn, void* cbdata) 
     read_request_body(conn, body, sizeof(body));
     char value[MAX_VALUE_LEN];
     if (extract_value_from_body(body, value, sizeof(value))) {
-        cl_remove(&g_circularlist, value);
+        circularLinkedList_remove(&g_circularlist, value);
     }
     return handle_circularlist_get(conn, NULL);
 }
 
 /* DELETE: /api/circular-list/remove-front */
 static int handle_circularlist_remove_front(struct mg_connection* conn, void* cbdata) {
-    cl_remove_front(&g_circularlist);
+    circularLinkedList_remove_front(&g_circularlist);
     return handle_circularlist_get(conn, NULL);
 }
 
 /* DELETE: /api/circular-list/remove-end */
 static int handle_circularlist_remove_end(struct mg_connection* conn, void* cbdata) {
-    cl_remove_end(&g_circularlist);
+    circularLinkedList_remove_end(&g_circularlist);
     return handle_circularlist_get(conn, NULL);
 }
 
@@ -88,13 +88,13 @@ static int handle_circularlist_remove_by_index(struct mg_connection* conn, void*
         send_json(conn, "{ \"error\": \"Missing or invalid index\" }");
         return FAILURE_RESPONSE_CODE;
     }
-    cl_remove_by_index(&g_circularlist, index);
+    circularLinkedList_remove_by_index(&g_circularlist, index);
     return handle_circularlist_get(conn, NULL);
 }
 
 /* DELETE: /api/circular-list/clear */
 static int handle_circularlist_clear(struct mg_connection* conn, void* cbdata) {
-    cl_clear(&g_circularlist);
+    circularLinkedList_clear(&g_circularlist);
     return handle_circularlist_get(conn, NULL);
 }
 

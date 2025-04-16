@@ -1,3 +1,11 @@
+/*
+* FILE : ds_stack.h
+* PROJECT : SENG1050 - Data Structures
+* PROGRAMMER : Mohammad Mehdi Ebrahimzadeh
+* FIRST VERSION : 2025-03-15
+* DESCRIPTION :
+* This file contains the declaration of the Stack data structure and its functions.
+*/
 #ifndef DS_STACK_H
 #define DS_STACK_H
 
@@ -16,14 +24,11 @@ typedef struct Stack {
 extern "C" {
 #endif
 
-    void stk_init(Stack* stack);
-    void stk_push(Stack* stack, const char* value);
-    void stk_pop(Stack* stack);
-	void stk_clear(Stack* stack);
-
-    /* Returns array of char* [stack top is array[0]]
-       caller frees array, not strings themselves. */
-    char** stk_collect_data(const Stack* stack, int* count);
+    void stack_init(Stack* stack);
+    void stack_push(Stack* stack, const char* value);
+    void stack_pop(Stack* stack);
+	void stack_clear(Stack* stack);
+    char** stack_collect_data(const Stack* stack, int* count);
 
 #ifdef __cplusplus
 }

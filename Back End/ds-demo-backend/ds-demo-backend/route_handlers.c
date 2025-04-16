@@ -33,17 +33,17 @@ void register_endpoints(struct mg_context* ctx) {
      * 2) Enqueue each data-structure initialization task.
      *    (Casting to (task_func_t) if your init function is void(*)(void*).)
      */
-    task_queue_enqueue(&queue, (task_func_t)ll_init, &g_list);
-    task_queue_enqueue(&queue, (task_func_t)stk_init, &g_stack);
-    task_queue_enqueue(&queue, (task_func_t)que_init, &g_queue);
+    task_queue_enqueue(&queue, (task_func_t)linkedlist_init, &g_list);
+    task_queue_enqueue(&queue, (task_func_t)stack_init, &g_stack);
+    task_queue_enqueue(&queue, (task_func_t)queue_init, &g_queue);
     task_queue_enqueue(&queue, (task_func_t)tree_init, &g_tree);
     task_queue_enqueue(&queue, (task_func_t)maxheap_init, &g_heap);
-    task_queue_enqueue(&queue, (task_func_t)hash_init, &g_hash);
+    task_queue_enqueue(&queue, (task_func_t)hashTable_init, &g_hash);
     task_queue_enqueue(&queue, (task_func_t)bst_init, &g_bst);
     task_queue_enqueue(&queue, (task_func_t)avl_init, &g_avl);
     task_queue_enqueue(&queue, (task_func_t)minheap_init, &g_minheap);
-    task_queue_enqueue(&queue, (task_func_t)sl_init, &g_sortedlist);
-    task_queue_enqueue(&queue, (task_func_t)cl_init, &g_circularlist);
+    task_queue_enqueue(&queue, (task_func_t)sortedlist_init, &g_sortedlist);
+    task_queue_enqueue(&queue, (task_func_t)circularLinkedList_init, &g_circularlist);
 
     /*
      * 3) Enqueue each endpoint registration task (pass the mg_context* as arg).
@@ -109,17 +109,17 @@ void clear_all_data_structures(void) {
     // 2) Directly add tasks to the thread pool.
     //    Each clear function takes a pointer to a data structure.
     //    Casting to (thread_task_func_t) if needed (depending on your definitions).
-    thread_pool_add_task(&pool, (thread_task_func_t)ll_clear, &g_list);
-    thread_pool_add_task(&pool, (thread_task_func_t)stk_clear, &g_stack);
-    thread_pool_add_task(&pool, (thread_task_func_t)que_clear, &g_queue);
+    thread_pool_add_task(&pool, (thread_task_func_t)linkedlist_clear, &g_list);
+    thread_pool_add_task(&pool, (thread_task_func_t)stack_clear, &g_stack);
+    thread_pool_add_task(&pool, (thread_task_func_t)queue_clear, &g_queue);
     thread_pool_add_task(&pool, (thread_task_func_t)tree_clear, &g_tree);
     thread_pool_add_task(&pool, (thread_task_func_t)maxheap_clear_null, &g_heap);
-    thread_pool_add_task(&pool, (thread_task_func_t)hash_clear, &g_hash);
+    thread_pool_add_task(&pool, (thread_task_func_t)hashTable_clear, &g_hash);
     thread_pool_add_task(&pool, (thread_task_func_t)bst_clear, &g_bst);
     thread_pool_add_task(&pool, (thread_task_func_t)avl_clear, &g_avl);
     thread_pool_add_task(&pool, (thread_task_func_t)minheap_clear_null, &g_minheap);
-    thread_pool_add_task(&pool, (thread_task_func_t)sl_clear, &g_sortedlist);
-    thread_pool_add_task(&pool, (thread_task_func_t)cl_clear, &g_circularlist);
+    thread_pool_add_task(&pool, (thread_task_func_t)sortedlist_clear, &g_sortedlist);
+    thread_pool_add_task(&pool, (thread_task_func_t)circularLinkedList_clear, &g_circularlist);
 
     // 3) Destroy the thread pool, which waits for all enqueued tasks to finish.
     thread_pool_destroy(&pool);

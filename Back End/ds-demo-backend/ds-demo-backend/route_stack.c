@@ -9,7 +9,7 @@ extern Stack g_stack;  // Global declared in route_handlers.c
 
 static int handle_get_stack(struct mg_connection* conn, void* cbdata) {
     int count = 0;
-    char** items = stk_collect_data(&g_stack, &count);
+    char** items = stack_collect_data(&g_stack, &count);
     char* json = build_json_array_response("stack", (const char**)items, count);
     if (items)
         free(items);
@@ -24,18 +24,18 @@ static int handle_post_stack_push(struct mg_connection* conn, void* cbdata) {
     read_request_body(conn, body, sizeof(body));
     char value[MAX_VALUE_LEN];
     if (extract_value_from_body(body, value, sizeof(value))) {
-        stk_push(&g_stack, value);
+        stack_ops_push(&g_stack, value);
     }
     return handle_get_stack(conn, NULL);
 }
 
 static int handle_delete_stack_pop(struct mg_connection* conn, void* cbdata) {
-    stk_pop(&g_stack);
+    stack_ops_pop(&g_stack);
     return handle_get_stack(conn, NULL);
 }
 
 static int handle_delete_stack_clear(struct mg_connection* conn, void* cbdata) {
-    stk_clear(&g_stack);
+    stack_clear(&g_stack);
     return handle_get_stack(conn, NULL);
 }
 

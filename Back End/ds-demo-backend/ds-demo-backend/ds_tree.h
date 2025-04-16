@@ -1,20 +1,27 @@
+/*
+* FILE : ds_tree.h
+* PROJECT : SENG1050 - Data Structures
+* PROGRAMMER : Mohammad Mehdi Ebrahimzadeh
+* FIRST VERSION : 2025-03-15
+* DESCRIPTION :
+* This file contains the declaration of a simple tree data structure and its functions.
+*/
 #ifndef DS_TREE_H
 #define DS_TREE_H
 
 #define TREE_MAX_LEN 64
 
-/* A general tree node that can have any number of children.
-   Each node stores a unique integer id and a data string. */
+
 typedef struct TreeNode {
-    int id;                      /* Unique identifier */
-    char data[TREE_MAX_LEN];     /* Node value */
-    struct TreeNode** children;  /* Dynamic array of child pointers */
+    int id;                      
+    char data[TREE_MAX_LEN];     
+    struct TreeNode** children;  
     int childrenCount;
 } TreeNode;
 
 typedef struct {
     TreeNode* root;
-    int nextId; /* Counter for unique IDs */
+    int nextId;
 } SimpleTree;
 
 #ifdef __cplusplus

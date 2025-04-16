@@ -1,10 +1,23 @@
+/*
+* FILE : ds_bst.c
+* PROJECT : SENG1050 - Data Structures
+* PROGRAMMER : Mohammad Mehdi Ebrahimzadeh
+* FIRST VERSION : 2025-03-15
+* DESCRIPTION :
+* This file contains the implementation of a Binary Search Tree (BST) data structure.
+*/
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "ds_bst.h"
 
-// Create a new BST node with a unique id
+// FUNCTION     : create_node
+// DESCRIPTION  :
+// Creates a new BST node with the given value.
+// PARAMETERS   : tree - pointer to the BST structure
+//              value - the value to store in the node (as a string)
+// RETURNS      : pointer to the new node (NULL if allocation fails)
 static BSTNode* create_node(SimpleBST* tree, const char* value) {
     BSTNode* node = (BSTNode*)malloc(sizeof(BSTNode));
     if (!node) return NULL;
@@ -16,14 +29,24 @@ static BSTNode* create_node(SimpleBST* tree, const char* value) {
     return node;
 }
 
-// Initialize the BST
+// FUNCTION     : bst_init
+// DESCRIPTION  :
+// Initializes the BST.
+// PARAMETERS   : tree - pointer to the BST structure
+// RETURNS      : none
 void bst_init(SimpleBST* tree) {
     if (!tree) return;
     tree->root = NULL;
     tree->nextId = 0;
 }
 
-// Recursive helper for BST insertion using numeric comparison
+// FUNCTION     : bst_insert_node
+// DESCRIPTION  :
+// Inserts a value into the BST recursively.
+//// PARAMETERS   : root - pointer to the current node
+////              tree - pointer to the BST structure
+////              value - the value to insert (as a string)
+// RETURNS      : pointer to the new root of the subtree after insertion
 static BSTNode* bst_insert_node(BSTNode* root, SimpleBST* tree, const char* value) {
     if (!root) {
         return create_node(tree, value);
@@ -37,26 +60,39 @@ static BSTNode* bst_insert_node(BSTNode* root, SimpleBST* tree, const char* valu
         root->right = bst_insert_node(root->right, tree, value);
     }
     else {
-        // Duplicate: update the data (though it will be the same)
         root->data = newVal;
     }
     return root;
 }
 
-// Insert a value into the BST
+// FUNCTION     : bst_insert
+// DESCRIPTION  :
+// Inserts a value into the BST.
+// PARAMETERS   : tree - pointer to the BST structure
+//			  value - the value to insert (as a string)
+// RETURNS      : none
 void bst_insert(SimpleBST* tree, const char* value) {
     if (!tree) return;
     tree->root = bst_insert_node(tree->root, tree, value);
 }
 
-// Find the node with minimum numeric value in a subtree
+// FUNCTION     : find_min
+// DESCRIPTION  :
+//  Finds the node with the minimum value in a subtree.
+//// PARAMETERS   : node - pointer to the root of the subtree
+//// RETURNS      : pointer to the node with the minimum value
 static BSTNode* find_min(BSTNode* node) {
     while (node && node->left)
         node = node->left;
     return node;
 }
 
-// Recursive helper for BST removal using numeric comparison
+// FUNCTION     : bst_remove_node
+// DESCRIPTION  :
+// Removes a node with the given value from the BST recursively.
+// PARAMETERS   : root - pointer to the current node
+//              value - the value to remove (as a string)
+// RETURNS      : pointer to the new root of the subtree after removal
 static BSTNode* bst_remove_node(BSTNode* root, const char* value) {
     if (!root) return NULL;
     int newVal = atoi(value);
@@ -82,7 +118,6 @@ static BSTNode* bst_remove_node(BSTNode* root, const char* value) {
         else {
             BSTNode* temp = find_min(root->right);
             root->data = temp->data;
-            // Remove the inorder successor by converting its data back to a string
             char buffer[32];
             sprintf(buffer, "%d", temp->data);
             root->right = bst_remove_node(root->right, buffer);
@@ -91,19 +126,31 @@ static BSTNode* bst_remove_node(BSTNode* root, const char* value) {
     return root;
 }
 
-// Remove a node (by value) from the BST
+// FUNCTION     : bst_remove
+// DESCRIPTION  :
+// Removes a value from the BST.
+// PARAMETERS   : tree - pointer to the BST structure
+//              value - the value to remove (as a string)
+// RETURNS      : none
 void bst_remove(SimpleBST* tree, const char* value) {
     if (!tree) return;
     tree->root = bst_remove_node(tree->root, value);
 }
 
-// Recursive helper to perform in-order traversal and collect node values as strings
-static void inorder_collect(BSTNode* root, char*** arr, int* count, int* cap) {
+// FUNCTION     : bst_collect_inorder
+// DESCRIPTION  :
+// Collects the BST nodes in in-order (sorted order).
+// PARAMETERS   : tree - pointer to the BST structure
+//			  count - pointer to store the number of nodes collected
+//            arr - pointer to store the array of strings
+//            capacity - pointer to store the capacity of the array
+//// RETURNS      : pointer to an array of strings representing the node values
+static void inorder_collect(BSTNode* root, char*** arr, int* count, int* capacity) {
     if (!root) return;
-    inorder_collect(root->left, arr, count, cap);
-    if (*count >= *cap) {
-        *cap *= 2;
-        char** temp = (char**)realloc(*arr, sizeof(char*) * (*cap));
+    inorder_collect(root->left, arr, count, capacity);
+    if (*count >= *capacity) {
+        *capacity *= 2;
+        char** temp = (char**)realloc(*arr, sizeof(char*) * (*capacity));
         if (temp) {
             *arr = temp;
         }
@@ -116,10 +163,15 @@ static void inorder_collect(BSTNode* root, char*** arr, int* count, int* cap) {
         strcpy((*arr)[*count], buffer);
     }
     (*count)++;
-    inorder_collect(root->right, arr, count, cap);
+    inorder_collect(root->right, arr, count, capacity);
 }
 
-// Collect BST nodes in in-order (sorted order)
+// FUNCTION     : bst_collect_inorder
+// DESCRIPTION  :
+// Collects the BST nodes in in-order (sorted order).
+// PARAMETERS   : tree - pointer to the BST structure
+// 			count - pointer to store the number of nodes collected
+// RETURNS      : pointer to an array of strings representing the node values
 char** bst_collect_inorder(const SimpleBST* tree, int* count) {
     if (!tree) {
         if (count) *count = 0;
@@ -136,7 +188,11 @@ char** bst_collect_inorder(const SimpleBST* tree, int* count) {
     return arr;
 }
 
-// Recursive helper to free BST nodes
+// FUNCTION     : bst_free_nodes
+// DESCRIPTION  :
+// Frees all nodes in the BST recursively.
+// PARAMETERS   : root - pointer to the current node
+// RETURNS      : none
 static void bst_free_nodes(BSTNode* root) {
     if (!root) return;
     bst_free_nodes(root->left);
@@ -144,20 +200,25 @@ static void bst_free_nodes(BSTNode* root) {
     free(root);
 }
 
-// Clear the entire BST
+// FUNCTION     : bst_clear
+// DESCRIPTION  :
+// Clears the BST, freeing all nodes.
+//// PARAMETERS   : tree - pointer to the BST structure
+//// RETURNS      : none
 void bst_clear(SimpleBST* tree) {
     if (!tree) return;
     bst_free_nodes(tree->root);
     tree->root = NULL;
 }
 
-// --- Convert BST to JSON ---
-// Recursive function to convert a BST node to JSON.
-// If a child is missing, returns "null".
-// Format: { "id": <id>, "value": <data>, "left": <leftJson>, "right": <rightJson> }
+// FUNCTION     : bst_to_json_recursive
+// DESCRIPTION  :
+// Converts a single BST node to a JSON string representation.
+//// PARAMETERS   : node - pointer to the BST node
+//// RETURNS      : JSON string representing the node
 static char* bst_to_json_recursive(BSTNode* node) {
     if (!node) {
-        char* null_str = (char*)malloc(5); // "null" + '\0'
+        char* null_str = (char*)malloc(5); 
         if (null_str) {
             strcpy(null_str, "null");
         }
@@ -176,7 +237,12 @@ static char* bst_to_json_recursive(BSTNode* node) {
     return result;
 }
 
-// Convert entire BST to JSON
+// FUNCTION     : bst_to_json
+// DESCRIPTION  :
+// Converts the entire BST to a JSON string representation.
+//// PARAMETERS   : tree - pointer to the BST structure
+//// RETURNS      : JSON string representing the BST
+// RETURNS      : JSON string (caller is responsible for freeing it)
 char* bst_to_json(const SimpleBST* tree) {
     if (!tree) {
         const char* bst_null = "{ \"bst\": null }";

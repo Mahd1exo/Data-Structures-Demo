@@ -1,3 +1,11 @@
+/*
+* FILE : ds_sortedlist.h
+* PROJECT : SENG1050 - Data Structures
+* PROGRAMMER : Mohammad Mehdi Ebrahimzadeh
+* FIRST VERSION : 2025-03-15
+* DESCRIPTION :
+* This file contains the declaration of the Sorted List data structure and its functions.
+*/
 #ifndef DS_SORTEDLIST_H
 #define DS_SORTEDLIST_H
 
@@ -18,15 +26,11 @@ typedef struct {
 extern "C" {
 #endif
 
-    void sl_init(SortedList* list);
-
-    void sl_insert(SortedList* list, const char* value);
-
-    void sl_remove(SortedList* list, const char* value);
-
-    char** sl_collect(const SortedList* list, int* count);
-
-    void sl_clear(SortedList* list);
+    void sortedlist_init(SortedList* list);
+    void sortedlist_insert(SortedList* list, const char* value);
+    void sortedlist_remove(SortedList* list, const char* value);
+    char** sortedlist_collect(const SortedList* list, int* count);
+    void sortedlist_clear(SortedList* list);
 
 #ifdef __cplusplus
 }

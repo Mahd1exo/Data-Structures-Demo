@@ -1,9 +1,24 @@
+/*
+* FILE : ds_queue.c
+* PROJECT : SENG1050 - Data Structures
+* PROGRAMMER : Mohammad Mehdi Ebrahimzadeh
+* FIRST VERSION : 2025-03-15
+* DESCRIPTION :
+* This file contains the implementation of a Queue data structure.
+*/
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "ds_queue.h"
 
+// FUNCTION     : safeCopy
+// DESCRIPTION  :
+// Safely copies a string to a destination buffer, ensuring null termination.
+// PARAMETERS   : dest - destination buffer
+//             src - source string
+//              maxLen - maximum length of the destination buffer
+// RETURNS      : none
 static void safeCopy(char* dest, const char* src, int maxLen) {
     if (!src) {
         dest[0] = '\0';
@@ -13,13 +28,19 @@ static void safeCopy(char* dest, const char* src, int maxLen) {
     dest[maxLen - 1] = '\0';
 }
 
-void que_init(Queue* queue) {
+void queue_init(Queue* queue) {
     if (!queue) return;
     queue->front = NULL;
     queue->rear = NULL;
 }
 
-void que_enqueue(Queue* queue, const char* value) {
+// FUNCTION     : queue_enqueue
+// DESCRIPTION  :
+// Adds a new node with the given value at the end of the queue.
+// PARAMETERS   : queue - pointer to the Queue structure
+//             value - the value to insert (as a string)
+// RETURNS      : none
+void queue_enqueue(Queue* queue, const char* value) {
     if (!queue) return;
     QueueNode* node = (QueueNode*)malloc(sizeof(QueueNode));
     if (!node) return;
@@ -36,7 +57,12 @@ void que_enqueue(Queue* queue, const char* value) {
     }
 }
 
-void que_dequeue(Queue* queue) {
+// FUNCTION     : queue_dequeue
+// DESCRIPTION  :
+// Removes the first node from the queue.
+// PARAMETERS   : queue - pointer to the Queue structure
+// RETURNS      : none
+void queue_dequeue(Queue* queue) {
     if (!queue || !queue->front) return;
     QueueNode* temp = queue->front;
     queue->front = temp->next;
@@ -46,33 +72,45 @@ void que_dequeue(Queue* queue) {
     free(temp);
 }
 
-void que_clear(Queue* queue) {
+// FUNCTION     : queue_remove
+// DESCRIPTION  :
+// Removes a node with the given value from the queue.
+// PARAMETERS   : queue - pointer to the Queue structure
+////              value - the value to remove (as a string)
+// RETURNS      : none
+void queue_clear(Queue* queue) {
     if (!queue) return;
     while (queue->front) {
-        que_dequeue(queue);
+        queue_dequeue(queue);
     }
     queue->rear = NULL;
 }
 
-char** que_collect_data(const Queue* queue, int* count) {
+// FUNCTION     : queue_remove
+// DESCRIPTION  :
+// Removes a node with the given value from the queue.
+// PARAMETERS   : queue - pointer to the Queue structure
+//             value - the value to remove (as a string)
+// RETURNS      : none
+char** queue_collect_data(const Queue* queue, int* count) {
     if (!queue) {
         if (count) *count = 0;
         return NULL;
     }
-    int c = 0;
+    int counter = 0;
     QueueNode* temp = queue->front;
     while (temp) {
-        c++;
+        counter++;
         temp = temp->next;
     }
-    if (count) *count = c;
+    if (count) *count = counter;
 
-    if (c == 0) {
+    if (counter == 0) {
         return NULL;
     }
-    char** array = (char**)malloc(sizeof(char*) * c);
+    char** array = (char**)malloc(sizeof(char*) * counter);
     temp = queue->front;
-    for (int i = 0; i < c; i++) {
+    for (int i = 0; i < counter; i++) {
         array[i] = temp->data;
         temp = temp->next;
     }

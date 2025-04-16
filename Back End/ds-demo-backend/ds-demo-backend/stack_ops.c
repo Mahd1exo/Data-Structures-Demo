@@ -1,56 +1,88 @@
+/*
+* FILE : stack_ops.c
+* PROJECT : SENG1050 - Data Structures
+* PROGRAMMER : Mohammad Mehdi Ebrahimzadeh
+* FIRST VERSION : 2025-03-15
+* DESCRIPTION :
+* This file contains the implementation of stack operations for a command history stack.
+*/
 #include "stack_ops.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-// Initialize the stack.
-void stack_init(Stack* s) {
-    s->top = NULL;
+// FUNCTION     : stack_ops_init
+// DESCRIPTION  :
+// Initializes the stack.
+// PARAMETERS   : stack - pointer to the Stack structure
+// RETURNS      : none
+void stack_ops_init(Stack* stack) {
+    stack->top = NULL;
 }
 
-// Push a command string onto the stack.
-void stack_push(Stack* s, const char* command) {
+// FUNCTION     : stack_ops_push
+// DESCRIPTION  :
+// Pushes a new command onto the stack.
+// PARAMETERS   : stack - pointer to the Stack structure
+//              command - the command to push (as a string)
+// RETURNS      : none
+void stack_ops_push(Stack* stack, const char* command) {
     StackNode* node = (StackNode*)malloc(sizeof(StackNode));
     if (node) {
-        // Duplicate the command string.
-        node->command = _strdup(command); // On POSIX systems, you can use strdup()
-        node->next = s->top;
-        s->top = node;
+        node->command = _strdup(command); 
+        node->next = stack->top;
+        stack->top = node;
     }
 }
 
-// Pop the top command string from the stack.
-char* stack_pop(Stack* s) {
-    if (s->top == NULL)
+// FUNCTION     : stack_ops_pop
+// DESCRIPTION  :
+// Pops the top command from the stack.
+// PARAMETERS   : stack - pointer to the Stack structure
+// RETURNS      : the popped command (as a string) or NULL if the stack is empty
+char* stack_ops_pop(Stack* stack) {
+    if (stack->top == NULL)
         return NULL;
-    StackNode* node = s->top;
-    s->top = node->next;
+    StackNode* node = stack->top;
+    stack->top = node->next;
     char* command = node->command;
     free(node);
     return command;
 }
 
-// Check if the stack is empty.
-bool stack_is_empty(const Stack* s) {
-    return (s->top == NULL);
+// FUNCTION     : stack_ops_peek
+// DESCRIPTION  :
+// Returns the top command from the stack without removing it.
+// PARAMETERS   : stack - pointer to the Stack structure
+// RETURNS      : the top command (as a string) or NULL if the stack is empty
+bool stack_ops_is_empty(const Stack* stack) {
+    return (stack->top == NULL);
 }
 
-// Free all nodes in the stack.
-void stack_free(Stack* s) {
-    while (!stack_is_empty(s)) {
-        char* cmd = stack_pop(s);
+// FUNCTION     : stack_ops_free
+// DESCRIPTION  :
+// Frees the memory allocated for the stack and its nodes.
+// PARAMETERS   : stack - pointer to the Stack structure
+// RETURNS      : none
+void stack_ops_free(Stack* stack) {
+    while (!stack_ops_is_empty(stack)) {
+        char* cmd = stack_ops_pop(stack);
         free(cmd);
     }
 }
 
-// Print the contents of the stack (most recent first).
-void print_stack(const Stack* s) {
-    if (s->top == NULL) {
+// FUNCTION     : print_stack_ops
+// DESCRIPTION  :
+// Prints the command history from the stack.
+// PARAMETERS   : stack - pointer to the Stack structure
+// RETURNS      : none
+void print_stack_ops(const Stack* stack) {
+    if (stack->top == NULL) {
         printf("No operations recorded.\n");
         return;
     }
     printf("Operation History (most recent first):\n");
-    StackNode* current = s->top;
+    StackNode* current = stack->top;
     while (current) {
         printf(" - %s\n", current->command);
         current = current->next;

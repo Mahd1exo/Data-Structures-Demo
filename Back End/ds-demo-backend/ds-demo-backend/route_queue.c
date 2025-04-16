@@ -9,7 +9,7 @@ extern Queue g_queue;  // Global declared in route_handlers.c
 
 static int handle_get_queue(struct mg_connection* conn, void* cbdata) {
     int count = 0;
-    char** items = que_collect_data(&g_queue, &count);
+    char** items = queue_collect_data(&g_queue, &count);
     char* json = build_json_array_response("queue", (const char**)items, count);
     if (items)
         free(items);
@@ -24,18 +24,18 @@ static int handle_post_queue_enqueue(struct mg_connection* conn, void* cbdata) {
     read_request_body(conn, body, sizeof(body));
     char value[MAX_VALUE_LEN];
     if (extract_value_from_body(body, value, sizeof(value))) {
-        que_enqueue(&g_queue, value);
+        queue_enqueue(&g_queue, value);
     }
     return handle_get_queue(conn, NULL);
 }
 
 static int handle_delete_queue_dequeue(struct mg_connection* conn, void* cbdata) {
-    que_dequeue(&g_queue);
+    queue_dequeue(&g_queue);
     return handle_get_queue(conn, NULL);
 }
 
 static int handle_delete_queue_clear(struct mg_connection* conn, void* cbdata) {
-    que_clear(&g_queue);
+    queue_clear(&g_queue);
     return handle_get_queue(conn, NULL);
 }
 

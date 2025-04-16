@@ -25,22 +25,22 @@ typedef struct {
 extern "C" {
 #endif
 
-    void cl_init(CircularList* list);
+    void circularLinkedList_init(CircularList* list);
 
     /* Insertion Functions */
-    void cl_insert(CircularList* list, const char* value);                
-    void cl_insert_by_index(CircularList* list, const char* value, int index); 
-    void cl_add_front(CircularList* list, const char* value);               
-    void cl_add_end(CircularList* list, const char* value);                 
+    void circularLinkedList_insert(CircularList* list, const char* value);                
+    void circularLinkedList_insert_by_index(CircularList* list, const char* value, int index); 
+    void circularLinkedList_add_front(CircularList* list, const char* value);               
+    void circularLinkedList_add_end(CircularList* list, const char* value);                 
 
     /* Removal Functions */
-    void cl_remove(CircularList* list, const char* value);                  
-    void cl_remove_front(CircularList* list);                         
-    void cl_remove_end(CircularList* list);                                 
-    void cl_remove_by_index(CircularList* list, int index);                 
+    void circularLinkedList_remove(CircularList* list, const char* value);                  
+    void circularLinkedList_remove_front(CircularList* list);                         
+    void circularLinkedList_remove_end(CircularList* list);                                 
+    void circularLinkedList_remove_by_index(CircularList* list, int index);                 
 
-    char** cl_collect_data(const CircularList* list, int* count);
-    void cl_clear(CircularList* list);
+    char** circularLinkedList_collect_data(const CircularList* list, int* count);
+    void circularLinkedList_clear(CircularList* list);
 
 #ifdef __cplusplus
 }
